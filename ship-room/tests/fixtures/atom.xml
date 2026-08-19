@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+<title>Atom Test</title>
+<entry><title>Treasury announces auction</title>
+<link href="https://example.org/a1" rel="alternate"/>
+<updated>2026-08-18T15:00:00Z</updated><summary>Details of the auction.</summary></entry>
+<entry><title>SEC charges firm</title>
+<link href="https://example.org/a2" rel="alternate"/>
+<updated>2026-08-17T15:00:00Z</updated><summary>Enforcement action.</summary></entry>
+</feed>

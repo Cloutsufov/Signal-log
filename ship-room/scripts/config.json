@@ -1,0 +1,19 @@
+{
+  "_comment": [
+    "The symbols the card EXPECTS to see. This list exists so a symbol that",
+    "stops reporting entirely shows up as MISSING instead of just quietly",
+    "vanishing off the page - which is exactly the bug that shipped in v1.",
+    "",
+    "JUNE: adding symbols is cheap in code and expensive in attention. Three",
+    "equities is already more than one person can honestly track daily. If you",
+    "add more, expect the extra calls to be worse, not better - you'll be",
+    "spending the same judgment across more surface."
+  ],
+  "equities": ["SPY", "QQQ", "IWM"],
+  "crypto": ["BTC-USD", "ETH-USD"],
+  "primary_symbol": "SPY",
+  "freshness_budget_minutes": {
+    "equity": 1800,
+    "crypto": 120
+  }
+}

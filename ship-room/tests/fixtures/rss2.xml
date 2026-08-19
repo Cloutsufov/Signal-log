@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"><channel>
+<title>Test Feed</title><link>https://example.org</link>
+<item><title>Fed holds rates steady</title><link>https://example.org/1</link>
+<pubDate>Tue, 18 Aug 2026 14:00:00 GMT</pubDate>
+<description>The FOMC left the target range unchanged.</description></item>
+<item><title>CPI comes in at 2.4%</title><link>https://example.org/2</link>
+<pubDate>Tue, 18 Aug 2026 12:30:00 GMT</pubDate>
+<description>&lt;b&gt;Bold&lt;/b&gt; inflation print below expectations.</description></item>
+<item><title>Jobless claims fall</title><link>https://example.org/3</link>
+<pubDate>Mon, 17 Aug 2026 12:30:00 GMT</pubDate>
+<description>Initial claims dropped.</description></item>
+</channel></rss>
