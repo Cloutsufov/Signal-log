@@ -150,6 +150,16 @@ def main() -> int:
     print(f"trigger: action={action or '(none)'} schedule={a.schedule or '(none)'}")
     print(f"ET now:  {to_et():%Y-%m-%d %H:%M} ({market_session()})")
 
+    supplied = (os.environ.get("CALL_DIRECTION", "").strip()
+                or os.environ.get("CALL_JSON", "").strip())
+    if supplied and action != "record":
+        # MARA: green-and-discarded is the worst outcome a form can produce.
+        shown = action or "(none)"
+        print(f"FATAL: a call was supplied but the action is '{shown}', not "
+              f"'record'. Nothing was logged. Re-run with the action dropdown "
+              f"set to 'record'.")
+        return 1
+
     steps = plan(action, a.schedule)
     if not steps:
         print("nothing to do for this trigger - exiting clean")
@@ -167,16 +177,29 @@ def main() -> int:
         args = [x for x in s if x != "OPT"]
 
         if args[0] == "__record__":
+            direction = os.environ.get("CALL_DIRECTION", "").strip().lower()
             call_json = os.environ.get("CALL_JSON", "").strip()
-            if not call_json:
-                print("FATAL: record requested but CALL_JSON is empty")
+            if not direction and not call_json:
+                print("FATAL: record requested but no call was supplied "
+                      "(set the direction/confidence/rationale fields)")
                 return 1
             # snapshot first so the reference contract locks in at a live price
             cls = "crypto" if a.symbol.endswith("-USD") else "equity"
             run("fetch_market.py", "--class", cls, "--symbols", a.symbol)
-            cmd = [sys.executable, os.path.join(HERE, "record_call.py"),
-                   "--symbol", a.symbol, "--json", call_json]
-            print(f"\n$ record_call.py --symbol {a.symbol} --json <pasted>", flush=True)
+            base = [sys.executable, os.path.join(HERE, "record_call.py"),
+                    "--symbol", a.symbol]
+            if direction:
+                cmd = base + [
+                    "--direction", direction,
+                    "--confidence", os.environ.get("CALL_CONFIDENCE", "3").strip(),
+                    "--rationale", os.environ.get("CALL_RATIONALE", "").strip(),
+                    "--invalidation", os.environ.get("CALL_INVALIDATION", "").strip()]
+                print(f"\n$ record_call.py --symbol {a.symbol} "
+                      f"--direction {direction} (fields)", flush=True)
+            else:
+                cmd = base + ["--json", call_json]
+                print(f"\n$ record_call.py --symbol {a.symbol} --json <pasted>",
+                      flush=True)
             if subprocess.run(cmd, cwd=os.path.dirname(HERE)).returncode != 0:
                 print("FATAL: the call was not recorded")
                 return 1

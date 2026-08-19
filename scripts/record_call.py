@@ -42,14 +42,35 @@ def main() -> int:
     ap.add_argument("--symbol", default="SPY")
     ap.add_argument("--json", dest="js")
     ap.add_argument("--model", default="manual")
+    # KWAN: separate fields, because JSON-through-a-single-line-web-form is a
+    # trap. The first real attempt pasted the pretty-printed version, GitHub's
+    # input took the first line, and the whole call arrived as "{". No amount
+    # of documentation fixes a form that can silently eat your input - so the
+    # form no longer asks for JSON at all.
+    ap.add_argument("--direction")
+    ap.add_argument("--confidence", type=int)
+    ap.add_argument("--rationale")
+    ap.add_argument("--invalidation", default="")
+    ap.add_argument("--horizon", type=int, default=1)
     a = ap.parse_args()
 
-    raw = a.js if a.js else sys.stdin.read()
-    try:
-        call = extract_json(raw)
-    except (ValueError, json.JSONDecodeError) as e:
-        print(f"could not parse call JSON: {e}", file=sys.stderr)
-        return 1
+    if a.direction:
+        call = {"direction": a.direction, "confidence": a.confidence,
+                "rationale": a.rationale or "", "horizon_days": a.horizon}
+        if a.invalidation:
+            call["invalidation"] = a.invalidation
+    else:
+        raw = a.js if a.js else sys.stdin.read()
+        try:
+            call = extract_json(raw)
+        except (ValueError, json.JSONDecodeError) as e:
+            print(f"could not parse call JSON: {e}", file=sys.stderr)
+            if raw.strip() in ("{", "}", "{}"):
+                print("  the input looks TRUNCATED - a single-line web form "
+                      "will keep only the first line of pretty-printed JSON. "
+                      "Use the separate direction/confidence/rationale fields "
+                      "instead.", file=sys.stderr)
+            return 1
 
     d = str(call.get("direction", "")).lower().strip()
     if d not in VALID_DIR:
