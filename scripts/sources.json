@@ -1,0 +1,44 @@
+{
+  "_comment": [
+    "MARA: 'unbiased' is not a property a news source has. What you can build is:",
+    "  (1) PRIMARY sources - the Fed, BLS, Treasury, SEC. These publish numbers,",
+    "      not narrative. Weight them first, always.",
+    "  (2) A SPREAD of press across leans. You are not filtering for truth, you",
+    "      are making disagreement visible. lean= is a label for the reader, not",
+    "      a score. Where left/center/right report the same fact, that fact is",
+    "      probably solid. Where they diverge, that IS the interesting signal.",
+    "Run `python3 scripts/doctor.py` to see which of these are actually alive.",
+    "Feeds die constantly - Reuters and AP both retired public RSS. Delete dead",
+    "ones rather than letting them fail silently every 30 minutes."
+  ],
+  "feeds": [
+    {"source": "Federal Reserve",       "tier": "primary", "lean": "data",   "url": "https://www.federalreserve.gov/feeds/press_all.xml"},
+    {"source": "Fed - Monetary Policy", "tier": "primary", "lean": "data",   "url": "https://www.federalreserve.gov/feeds/press_monetary.xml"},
+    {"source": "BLS Releases",          "tier": "primary", "lean": "data",   "url": "https://www.bls.gov/feed/bls_latest.rss"},
+    {"source": "Treasury Press",        "tier": "primary", "lean": "data",   "url": "https://home.treasury.gov/system/files/126/press_releases.xml"},
+    {"source": "SEC Press",             "tier": "primary", "lean": "data",   "url": "https://www.sec.gov/news/pressreleases.rss"},
+    {"source": "BEA News",              "tier": "primary", "lean": "data",   "url": "https://www.bea.gov/rss.xml"},
+
+    {"source": "NPR Business",          "tier": "press",   "lean": "left",   "url": "https://feeds.npr.org/1006/rss.xml"},
+    {"source": "Guardian Business",     "tier": "press",   "lean": "left",   "url": "https://www.theguardian.com/uk/business/rss"},
+    {"source": "CNBC Top News",         "tier": "press",   "lean": "center", "url": "https://www.cnbc.com/id/100003114/device/rss/rss.html"},
+    {"source": "CNBC Markets",          "tier": "press",   "lean": "center", "url": "https://www.cnbc.com/id/20910258/device/rss/rss.html"},
+    {"source": "MarketWatch",           "tier": "press",   "lean": "center", "url": "https://feeds.content.dowjones.io/public/rss/mw_topstories"},
+    {"source": "Yahoo Finance",         "tier": "press",   "lean": "center", "url": "https://finance.yahoo.com/news/rssindex"},
+    {"source": "Fox Business",          "tier": "press",   "lean": "right",  "url": "https://moxie.foxbusiness.com/google-publisher/markets.xml"},
+    {"source": "Washington Times Biz",  "tier": "press",   "lean": "right",  "url": "https://www.washingtontimes.com/rss/headlines/news/business/"},
+    {"source": "BBC Business",          "tier": "press",   "lean": "intl",   "url": "https://feeds.bbci.co.uk/news/business/rss.xml"},
+    {"source": "Al Jazeera",            "tier": "press",   "lean": "intl",   "url": "https://www.aljazeera.com/xml/rss/all.xml"},
+    {"source": "DW Business",           "tier": "press",   "lean": "intl",   "url": "https://rss.dw.com/xml/rss-en-bus"},
+
+    {"source": "CoinDesk",              "tier": "press",   "lean": "crypto", "url": "https://www.coindesk.com/arc/outboundfeeds/rss/"},
+    {"source": "Cointelegraph",         "tier": "press",   "lean": "crypto", "url": "https://cointelegraph.com/rss"},
+    {"source": "Bitcoin Magazine",      "tier": "press",   "lean": "crypto", "url": "https://bitcoinmagazine.com/feed"}
+  ],
+  "keywords_important": [
+    "fed", "fomc", "rate", "inflation", "cpi", "ppi", "jobs", "payroll",
+    "unemployment", "gdp", "recession", "tariff", "treasury", "yield",
+    "earnings", "guidance", "default", "downgrade", "sanction", "opec",
+    "etf", "sec", "halving", "liquidation"
+  ]
+}
