@@ -7,11 +7,19 @@
     "JUNE: adding symbols is cheap in code and expensive in attention. Three",
     "equities is already more than one person can honestly track daily. If you",
     "add more, expect the extra calls to be worse, not better - you'll be",
-    "spending the same judgment across more surface."
+    "spending the same judgment across more surface.",
+    "primary_symbol switched to BTC-USD after the live run: every free keyless equity source returns HTTP 429 from a GitHub runner, while Coinbase serves crypto happily. Crypto also runs 24/7, so you accumulate scored calls about 5x faster than two equity snapshots a day. Switch back to SPY the moment a quote key is in place."
   ],
-  "equities": ["SPY", "QQQ", "IWM"],
-  "crypto": ["BTC-USD", "ETH-USD"],
-  "primary_symbol": "SPY",
+  "equities": [
+    "SPY",
+    "QQQ",
+    "IWM"
+  ],
+  "crypto": [
+    "BTC-USD",
+    "ETH-USD"
+  ],
+  "primary_symbol": "BTC-USD",
   "freshness_budget_minutes": {
     "equity": 1800,
     "crypto": 120

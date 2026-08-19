@@ -29,7 +29,7 @@ def snapshot(con, symbol: str, asset_class: str, session: str) -> tuple[bool, st
     chain_note = ""
     if asset_class == "equity":
         try:
-            ch = P.yahoo_option_chain(symbol)
+            ch = P.get_option_chain(symbol)
             sl = P.atm_slice(ch, spot)
             chain_json = json.dumps(sl, separators=(",", ":"))
             chain_note = f" chain=ok({len(sl['calls'])}c/{len(sl['puts'])}p)"

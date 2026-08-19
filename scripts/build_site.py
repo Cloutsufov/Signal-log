@@ -599,10 +599,29 @@ def agreement_card(con, cfg: dict) -> str:
             f'</div>')
 
 
+def scoring_mode_banner(con) -> str:
+    """MARA: if no snapshot anywhere has an option chain, then every call we
+    score is being scored on direction alone - the metric I have called a
+    vanity metric in this codebase about six times. It is still worth logging,
+    because direction accuracy near 50% is itself a finding. But the page must
+    say out loud that the honest half of the scoring is switched off, or the
+    record will read as more meaningful than it is."""
+    n = con.execute("SELECT COUNT(*) n FROM snapshots "
+                    "WHERE chain_json IS NOT NULL").fetchone()["n"]
+    if n:
+        return ""
+    return ('<div class="banner warn"><span>⚠</span><span>DIRECTION-ONLY '
+            'SCORING — no option chain data is available, so calls are graded '
+            'on whether spot moved the right way and nothing else. That is the '
+            'flattering half of the measurement: you can be right on direction '
+            'and still lose money to theta and the spread. Treat every hit rate '
+            'below as an upper bound.</span></div>')
+
+
 def page_index(con, cfg: dict) -> str:
     st = record_stats(con)
     latest = latest_per_symbol(con)
-    body = [freshness_banner(con, cfg), LEGEND]
+    body = [freshness_banner(con, cfg), scoring_mode_banner(con), LEGEND]
 
     # latest call per symbol that has one
     calls = con.execute("""
@@ -781,7 +800,7 @@ def page_index(con, cfg: dict) -> str:
 def page_record(con, cfg: dict) -> str:
     st = record_stats(con)
     cal = calibration(con)
-    body = [freshness_banner(con, cfg)]
+    body = [freshness_banner(con, cfg), scoring_mode_banner(con)]
 
     vclass, vhead, vtext = calibration_verdict(cal)
     body.append(f'<div class="banner {vclass}"><span>'

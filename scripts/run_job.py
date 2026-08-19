@@ -17,6 +17,7 @@ Run locally to see what WOULD happen, without doing it:
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import subprocess
 import sys
@@ -44,8 +45,18 @@ SLOT_TOLERANCE_MIN = 55  # < 60 so the EST and EDT crons can never both match
 FREQUENT_CRON = "*/30 * * * *"
 WEEKLY_CRON = "17 12 * * 1"
 
+def _primary() -> str:
+    try:
+        with open(os.path.join(os.path.dirname(HERE), "scripts",
+                               "config.json")) as f:
+            return json.load(f).get("primary_symbol", "SPY")
+    except Exception:  # noqa: BLE001
+        return "SPY"
+
+
 EQUITIES = "SPY,QQQ,IWM"
 CRYPTO = "BTC-USD,ETH-USD"
+PRIMARY = _primary()
 
 
 def run(*args: str, optional: bool = False) -> bool:
@@ -83,7 +94,7 @@ def plan(action: str, schedule: str, et_minutes: int | None = None) -> list[tupl
                   ("fetch_market.py", "--class", "equity", "--symbols", EQUITIES, "OPT"),
                   ("fetch_market.py", "--class", "crypto", "--symbols", CRYPTO, "OPT"),
                   ("fetch_news.py", "OPT"),
-                  ("make_prompt.py", "--symbol", "SPY", "OPT"),
+                  ("make_prompt.py", "--symbol", PRIMARY, "OPT"),
                   ("build_site.py",)]
     elif action == "doctor":
         steps += [("doctor.py", "--prune", "OPT"), ("build_site.py",)]
@@ -94,7 +105,7 @@ def plan(action: str, schedule: str, et_minutes: int | None = None) -> list[tupl
                   ("fetch_market.py", "--class", "crypto", "--symbols", CRYPTO, "OPT"),
                   ("fetch_news.py", "OPT"),
                   ("score.py", "OPT"),
-                  ("make_prompt.py", "--symbol", "SPY", "OPT"),
+                  ("make_prompt.py", "--symbol", PRIMARY, "OPT"),
                   ("build_site.py",)]
 
     elif schedule in EQUITY_CRONS:
@@ -107,7 +118,7 @@ def plan(action: str, schedule: str, et_minutes: int | None = None) -> list[tupl
             steps += [("fetch_market.py", "--class", "equity",
                        "--symbols", EQUITIES, "OPT"),
                       ("score.py", "OPT"),
-                      ("make_prompt.py", "--symbol", "SPY", "OPT"),
+                      ("make_prompt.py", "--symbol", PRIMARY, "OPT"),
                       ("build_site.py",)]
         # else: the other half of the DST pair. Nothing to do, not an error.
     elif schedule == FREQUENT_CRON:

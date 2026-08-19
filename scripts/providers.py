@@ -14,6 +14,7 @@ from __future__ import annotations
 import csv
 import io
 import json
+import os
 from typing import Any
 
 from common import FetchError, http_get, http_json
@@ -110,6 +111,148 @@ def stooq_light_quote(symbol: str) -> dict:
     return q
 
 
+# ---------------------------------------------------------- keyed providers
+#
+# KWAN: The first live run answered the question I could not answer from my
+# sandbox, and the answer is unpleasant:
+#
+#   yahoo q1/q2 SPY QQQ IWM  -> HTTP 429, in 54ms
+#   yahoo option chain       -> HTTP 429, in 58ms
+#   stooq                    -> 404 / garbage
+#   coinbase                 -> fine
+#
+# 54 milliseconds is not throttling caused by our traffic. That is the edge
+# rejecting the IP before it looks at anything. GitHub Actions runners come
+# from shared datacenter ranges that Yahoo blanket-limits, and no amount of
+# retrying, header-faking or host-swapping fixes it - nor should we try, since
+# routing around a block someone put there deliberately is not engineering.
+#
+# So: free-and-keyless equity data does not work from a cloud IP. It works from
+# your laptop and it does not work here. The honest fix is a free API key held
+# as a GitHub Actions secret. Still $0/month. No longer zero-signup.
+#
+# RIOS: read this part. These are READ-ONLY MARKET DATA tokens. They cannot
+# place a trade, move money, or see an account. That is a completely different
+# risk object from a brokerage login, which is why I'm fine with these and
+# still not fine with Robinhood. They live in GitHub Secrets, never in the
+# repo, and Actions redacts them from logs. If one leaks, someone can look up
+# the price of SPY, which they could also do by opening a browser.
+
+
+def _env(*names: str) -> str | None:
+    for n in names:
+        v = (os.environ.get(n) or "").strip()
+        if v:
+            return v
+    return None
+
+
+def parse_finnhub_quote(payload: dict) -> dict:
+    """Finnhub /quote -> c=current, pc=previous close."""
+    c, pc = payload.get("c"), payload.get("pc")
+    if not c:
+        raise FetchError(f"finnhub returned no price (payload keys: "
+                         f"{sorted(payload)[:6]})")
+    return {"spot": float(c), "prev_close": float(pc) if pc else None,
+            "currency": "USD", "exchange": "finnhub", "ts": payload.get("t")}
+
+
+def finnhub_quote(symbol: str) -> dict:
+    key = _env("FINNHUB_KEY", "FINNHUB_API_KEY")
+    if not key:
+        raise FetchError("no FINNHUB_KEY set")
+    url = f"https://finnhub.io/api/v1/quote?symbol={symbol}&token={key}"
+    q = parse_finnhub_quote(http_json(url))
+    q["provider"] = "finnhub"
+    return q
+
+
+def parse_twelvedata_quote(payload: dict) -> dict:
+    if payload.get("status") == "error" or "close" not in payload:
+        raise FetchError(f"twelvedata error: {payload.get('message', payload)}")
+    return {"spot": float(payload["close"]),
+            "prev_close": float(payload["previous_close"])
+            if payload.get("previous_close") else None,
+            "currency": payload.get("currency", "USD"),
+            "exchange": payload.get("exchange", "twelvedata"),
+            "ts": payload.get("datetime")}
+
+
+def twelvedata_quote(symbol: str) -> dict:
+    key = _env("TWELVEDATA_KEY", "TWELVE_DATA_KEY")
+    if not key:
+        raise FetchError("no TWELVEDATA_KEY set")
+    url = f"https://api.twelvedata.com/quote?symbol={symbol}&apikey={key}"
+    q = parse_twelvedata_quote(http_json(url))
+    q["provider"] = "twelvedata"
+    return q
+
+
+def parse_tradier_quote(payload: dict) -> dict:
+    q = ((payload or {}).get("quotes") or {}).get("quote")
+    if isinstance(q, list):
+        q = q[0] if q else None
+    if not q or q.get("last") is None:
+        raise FetchError(f"tradier returned no quote: {str(payload)[:120]}")
+    return {"spot": float(q["last"]),
+            "prev_close": float(q["prevclose"]) if q.get("prevclose") else None,
+            "currency": "USD", "exchange": "tradier-sandbox",
+            "ts": q.get("trade_date")}
+
+
+def _tradier(path: str) -> dict:
+    token = _env("TRADIER_TOKEN")
+    if not token:
+        raise FetchError("no TRADIER_TOKEN set")
+    return http_json(f"https://sandbox.tradier.com/v1/{path}",
+                     headers={"Authorization": f"Bearer {token}",
+                              "Accept": "application/json"})
+
+
+def tradier_quote(symbol: str) -> dict:
+    q = parse_tradier_quote(_tradier(f"markets/quotes?symbols={symbol}"))
+    q["provider"] = "tradier"
+    return q
+
+
+def parse_tradier_chain(payload: dict) -> list[dict]:
+    opts = ((payload or {}).get("options") or {}).get("option")
+    if opts is None:
+        raise FetchError(f"tradier chain empty: {str(payload)[:120]}")
+    return opts if isinstance(opts, list) else [opts]
+
+
+def tradier_option_chain(symbol: str, expiry: str | None = None) -> dict:
+    """Tradier sandbox option chain, normalised to the Yahoo shape so the rest
+    of the codebase does not care which provider answered."""
+    if not expiry:
+        exp = _tradier(f"markets/options/expirations?symbol={symbol}")
+        dates = ((exp or {}).get("expirations") or {}).get("date")
+        if isinstance(dates, str):
+            dates = [dates]
+        if not dates:
+            raise FetchError("tradier returned no expirations")
+        expiry = dates[0]
+
+    raw = parse_tradier_chain(_tradier(
+        f"markets/options/chains?symbol={symbol}&expiration={expiry}"
+        f"&greeks=true"))
+
+    def norm(o: dict) -> dict:
+        g = o.get("greeks") or {}
+        return {"contractSymbol": o.get("symbol"), "strike": o.get("strike"),
+                "bid": o.get("bid"), "ask": o.get("ask"),
+                "lastPrice": o.get("last"), "volume": o.get("volume"),
+                "openInterest": o.get("open_interest"),
+                "impliedVolatility": g.get("mid_iv") or g.get("smv_vol"),
+                "inTheMoney": None}
+
+    calls = [norm(o) for o in raw if o.get("option_type") == "call"]
+    puts = [norm(o) for o in raw if o.get("option_type") == "put"]
+    return {"spot": None, "expirations": [expiry], "expiry": expiry,
+            "calls": calls, "puts": puts, "provider": "tradier"}
+
+
 def parse_coinbase_spot(payload: dict) -> dict:
     try:
         return {"spot": float(payload["data"]["amount"]),
@@ -139,9 +282,17 @@ def get_quote(symbol: str, asset_class: str) -> dict:
         # showed the equity rail failing where crypto and news both worked.
         # A datacenter IP is treated very differently from a home IP by these
         # free endpoints, so we try more than one host and more than one shape.
-        chain = [("yahoo-q1", lambda: yahoo_quote(symbol)),
+        # Order changed after the first live run. The keyless providers are
+        # tried LAST now, not first: from a GitHub runner they return 429 in
+        # ~54ms every time, so leading with them just adds latency and noise.
+        # They stay in the chain because they DO work from a home IP, and
+        # someone running this on their own machine should still get data
+        # without signing up for anything.
+        chain = [("tradier", lambda: tradier_quote(symbol)),
+                 ("finnhub", lambda: finnhub_quote(symbol)),
+                 ("twelvedata", lambda: twelvedata_quote(symbol)),
+                 ("yahoo-q1", lambda: yahoo_quote(symbol)),
                  ("yahoo-q2", lambda: yahoo_quote(symbol, "query2")),
-                 ("stooq-light", lambda: stooq_light_quote(symbol)),
                  ("stooq-daily", lambda: stooq_quote(symbol))]
 
     errors = []
@@ -174,6 +325,27 @@ def parse_yahoo_options(payload: dict) -> dict:
         "calls": opts.get("calls", []),
         "puts": opts.get("puts", []),
     }
+
+
+def get_option_chain(symbol: str, expiry=None) -> dict:
+    """Chain from whichever provider answers.
+
+    MARA: Yahoo's options endpoint returns 429 from CI, which would have left
+    boxes 2/3/4 permanently empty and reduced scoring to the vanity metric.
+    Tradier's sandbox serves delayed chains with greeks on a free developer
+    token, which is enough to price an ATM contract honestly.
+    """
+    errors = []
+    for name, fn in (("tradier", lambda: tradier_option_chain(
+                          symbol, expiry if isinstance(expiry, str) else None)),
+                     ("yahoo", lambda: yahoo_option_chain(
+                          symbol, expiry if isinstance(expiry, int) else None))):
+        try:
+            return fn()
+        except Exception as ex:  # noqa: BLE001
+            code = getattr(ex, "status", None)
+            errors.append(f"{name}: " + (f"HTTP {code}" if code else str(ex)[:100]))
+    raise FetchError(f"no option chain for {symbol}: " + " | ".join(errors))
 
 
 def yahoo_option_chain(symbol: str, expiry_epoch: int | None = None) -> dict:

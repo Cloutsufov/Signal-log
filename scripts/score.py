@@ -73,7 +73,7 @@ def score_one(con, call) -> str:
     if call["ref_contract"] and call["ref_price"]:
         try:
             expiry = json.loads(snap["chain_json"]).get("expiry")
-            ch = P.yahoo_option_chain(sym, expiry)
+            ch = P.get_option_chain(sym, expiry)
             sl = P.atm_slice(ch, spot_now, width=12)
             found = P.find_contract(sl, call["ref_contract"])
             if found and found.get("mid"):

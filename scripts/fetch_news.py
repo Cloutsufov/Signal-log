@@ -165,12 +165,33 @@ def main() -> int:
 
     # prune: keep 30 days
     con.execute("DELETE FROM news WHERE fetched_utc < datetime('now','-30 day')")
+
+    # DEV: the keyword filter only gates NEW inserts, so the Ebola and football
+    # headlines already in the table would have survived it forever and the fix
+    # would have looked like it did nothing. Sweep the existing rows too.
+    filtered_sources = [f["source"] for f in cfg["feeds"] if f.get("filter")]
+    purged = 0
+    if filtered_sources and keywords:
+        rows = con.execute(
+            "SELECT id, title, summary FROM news WHERE source IN ({})".format(
+                ",".join("?" * len(filtered_sources))), filtered_sources).fetchall()
+        stale = [r["id"] for r in rows
+                 if not is_relevant({"title": r["title"],
+                                     "summary": r["summary"]}, keywords)]
+        for i in range(0, len(stale), 400):
+            batch = stale[i:i + 400]
+            con.execute("DELETE FROM news WHERE id IN ({})".format(
+                ",".join("?" * len(batch))), batch)
+        purged = len(stale)
+        if purged:
+            print(f"  purged {purged} off-topic headlines already in the table")
     con.commit()
 
     status = "ok" if not dead else ("partial" if alive else "fail")
     log_run(con, "fetch_news", status,
             f"alive={len(alive)} dead={len(dead)} new={added} :: {', '.join(dead)}")
-    print(f"\n{len(alive)} feeds alive, {len(dead)} dead, {added} new headlines"
+    print(f"\n{len(alive)} feeds alive, {len(dead)} dead, {added} new headlines, "
+          f"{filtered_out} filtered as off-topic, {purged} purged from history"
           f"\ndead: {', '.join(dead) or 'none'}")
     con.close()
     return 0 if alive else 1
