@@ -28,31 +28,10 @@
       "filter": false
     },
     {
-      "source": "BLS Releases",
-      "tier": "primary",
-      "lean": "data",
-      "url": "https://www.bls.gov/feed/bls_latest.rss",
-      "filter": false
-    },
-    {
-      "source": "Treasury Press",
-      "tier": "primary",
-      "lean": "data",
-      "url": "https://home.treasury.gov/system/files/126/press_releases.xml",
-      "filter": false
-    },
-    {
       "source": "SEC Press",
       "tier": "primary",
       "lean": "data",
       "url": "https://www.sec.gov/news/pressreleases.rss",
-      "filter": false
-    },
-    {
-      "source": "BEA News",
-      "tier": "primary",
-      "lean": "data",
-      "url": "https://www.bea.gov/rss.xml",
       "filter": false
     },
     {
@@ -105,13 +84,6 @@
       "filter": false
     },
     {
-      "source": "Washington Times Biz",
-      "tier": "press",
-      "lean": "right",
-      "url": "https://www.washingtontimes.com/rss/headlines/news/business/",
-      "filter": false
-    },
-    {
       "source": "BBC Business",
       "tier": "press",
       "lean": "intl",
@@ -144,13 +116,6 @@
       "tier": "press",
       "lean": "crypto",
       "url": "https://cointelegraph.com/rss",
-      "filter": false
-    },
-    {
-      "source": "Bitcoin Magazine",
-      "tier": "press",
-      "lean": "crypto",
-      "url": "https://bitcoinmagazine.com/feed",
       "filter": false
     }
   ],
