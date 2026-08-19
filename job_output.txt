@@ -1,0 +1,105 @@
+trigger: action=bootstrap schedule=(none)
+ET now:  2026-08-18 21:45 (postclose)
+plan:    6 step(s)
+  - doctor.py --prune
+  - fetch_market.py --class equity --symbols SPY,QQQ,IWM
+  - fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
+  - fetch_news.py
+  - make_prompt.py --symbol SPY
+  - build_site.py
+
+$ /home/runner/work/Signal-log/Signal-log/scripts/doctor.py --prune
+=== quotes ===
+  DEAD  yahoo chart SPY                     3895ms  FetchError: GET https://query1.finance.yahoo.com/v8/finance/chart/SPY?range=5d&interval=1d failed afte
+  DEAD  stooq eod SPY                        677ms  KeyError: 'Close'
+  DEAD  yahoo chart QQQ                     3863ms  FetchError: GET https://query1.finance.yahoo.com/v8/finance/chart/QQQ?range=5d&interval=1d failed afte
+  DEAD  stooq eod QQQ                        780ms  KeyError: 'Close'
+  DEAD  yahoo chart IWM                     3883ms  FetchError: GET https://query1.finance.yahoo.com/v8/finance/chart/IWM?range=5d&interval=1d failed afte
+  DEAD  stooq eod IWM                        692ms  KeyError: 'Close'
+  OK    coinbase BTC-USD                      97ms  spot 64364.785
+  OK    coinbase ETH-USD                      51ms  spot 1912.445
+
+=== options ===
+  DEAD  yahoo option chain SPY              3893ms  FetchError: GET https://query2.finance.yahoo.com/v7/finance/options/SPY failed after 3 tries: HTTP Err
+  DEAD  yahoo option chain QQQ              3892ms  FetchError: GET https://query2.finance.yahoo.com/v7/finance/options/QQQ failed after 3 tries: HTTP Err
+  DEAD  yahoo option chain IWM              3873ms  FetchError: GET https://query2.finance.yahoo.com/v7/finance/options/IWM failed after 3 tries: HTTP Err
+
+=== news feeds ===
+  OK    Federal Reserve [data]                96ms  20 items | Federal Reserve Board issues enforcement act
+  OK    Fed - Monetary Policy [data]          90ms  15 items | Federal Reserve issues FOMC statement
+  DEAD  BLS Releases [data]                  222ms  FetchError: GET https://www.bls.gov/feed/bls_latest.rss failed after 1 tries: HTTP Error 403: Forbidde
+  DEAD  Treasury Press [data]                354ms  ParseError: not well-formed (invalid token): line 5, column 14
+  OK    SEC Press [data]                     176ms  25 items | SEC Charges Former Executives With Fraud in 
+  DEAD  BEA News [data]                      319ms  FetchError: GET https://www.bea.gov/rss.xml failed after 1 tries: HTTP Error 404: Not Found
+  OK    NPR Business [left]                  257ms  10 items | An iconic mail-order music and video company
+  OK    Guardian Business [left]             134ms  40 items | UK risks running out of gas by 2030s, minist
+  OK    CNBC Top News [center]               200ms  30 items | Trump says no talks scheduled with Iran as h
+  OK    CNBC Markets [center]                233ms  30 items | Russia says its economy is strong. It just f
+  OK    MarketWatch [center]                 257ms  10 items | Cerebras’s stock has been a post-IPO bust. I
+  OK    Yahoo Finance [center]               104ms  50 items | Apple upgraded, Workday downgraded: Wall Str
+  OK    Fox Business [right]                 183ms  25 items | OpenAI builds dedicated ChatGPT experience f
+  DEAD  Washington Times Biz [right]         103ms  FetchError: GET https://www.washingtontimes.com/rss/headlines/news/business/ failed after 1 tries: HTT
+  OK    BBC Business [intl]                  139ms  54 items | Meta hooked children on Facebook and Instagr
+  OK    Al Jazeera [intl]                    181ms  25 items | How Ebola became the deadliest outbreak in D
+  OK    DW Business [intl]                   670ms  20 items | As drought hits Germany's harvest, will food
+  OK    CoinDesk [crypto]                    229ms  25 items | ‘It has to pass’: Andrew Cuomo warns U.S. is
+  OK    Cointelegraph [crypto]               123ms  30 items | SEC proposes new crypto rules in absence of 
+  DEAD  Bitcoin Magazine [crypto]            142ms  FetchError: GET https://bitcoinmagazine.com/feed failed after 1 tries: HTTP Error 403: Forbidden
+
+=== summary ===
+  quotes:  2/8 provider+symbol combinations alive
+  options: 0/3 chains alive - scoring degrades to spot-only
+  news:    15/20 feeds alive
+  PRUNED 5 dead feed(s) from sources.json:
+    BLS Releases
+    Treasury Press
+    BEA News
+    Washington Times Biz
+    Bitcoin Magazine
+  (one bad run can remove a good feed - revert the commit if a source you want disappears)
+
+  NOTE: without a chain, calls still record and score on spot,
+  but option P&L will be blank. That is a degraded mode, not a
+  broken one. Check if Yahoo now requires a cookie+crumb.
+
+$ /home/runner/work/Signal-log/Signal-log/scripts/fetch_market.py --class equity --symbols SPY,QQQ,IWM
+FATAL: every symbol failed - check scripts/doctor.py output
+  FAIL SPY: quote failed: all providers failed for SPY: GET https://query1.finance.yahoo.com/v8/finance/chart/SPY?range=5d&interval=1d failed after 3 tries: HTTP Error 429: Too Many Requests | 'Close'
+  FAIL QQQ: quote failed: all providers failed for QQQ: GET https://query1.finance.yahoo.com/v8/finance/chart/QQQ?range=5d&interval=1d failed after 3 tries: HTTP Error 429: Too Many Requests | 'Close'
+  FAIL IWM: quote failed: all providers failed for IWM: GET https://query1.finance.yahoo.com/v8/finance/chart/IWM?range=5d&interval=1d failed after 3 tries: HTTP Error 429: Too Many Requests | 'Close'
+  -> exit 1  (tolerated)
+
+$ /home/runner/work/Signal-log/Signal-log/scripts/fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
+  ok  BTC-USD: 64366.925 via coinbase
+  ok  ETH-USD: 1912.145 via coinbase
+
+$ /home/runner/work/Signal-log/Signal-log/scripts/fetch_news.py
+  ok    Federal Reserve          20 items, 20 new
+  ok    Fed - Monetary Policy    15 items, 11 new
+  ok    SEC Press                25 items, 25 new
+  ok    NPR Business             10 items, 10 new
+  ok    Guardian Business        40 items, 25 new
+  ok    CNBC Top News            30 items, 25 new
+  ok    CNBC Markets             30 items, 25 new
+  ok    MarketWatch              10 items, 10 new
+  ok    Yahoo Finance            50 items, 25 new
+  ok    Fox Business             25 items, 25 new
+  ok    BBC Business             54 items, 25 new
+  ok    Al Jazeera               25 items, 25 new
+  ok    DW Business              20 items, 20 new
+  ok    CoinDesk                 25 items, 25 new
+  ok    Cointelegraph            30 items, 25 new
+
+15 feeds alive, 0 dead, 321 new headlines
+dead: none
+
+$ /home/runner/work/Signal-log/Signal-log/scripts/make_prompt.py --symbol SPY
+no snapshot for SPY - run fetch_market.py first
+  -> exit 1  (tolerated)
+
+$ /home/runner/work/Signal-log/Signal-log/scripts/build_site.py
+wrote docs/index.html (12,115 bytes)
+wrote docs/record.html (7,469 bytes)
+wrote docs/news.html (38,236 bytes)
+
+done

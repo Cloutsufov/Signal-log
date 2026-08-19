@@ -12,33 +12,121 @@
     "ones rather than letting them fail silently every 30 minutes."
   ],
   "feeds": [
-    {"source": "Federal Reserve",       "tier": "primary", "lean": "data",   "url": "https://www.federalreserve.gov/feeds/press_all.xml"},
-    {"source": "Fed - Monetary Policy", "tier": "primary", "lean": "data",   "url": "https://www.federalreserve.gov/feeds/press_monetary.xml"},
-    {"source": "BLS Releases",          "tier": "primary", "lean": "data",   "url": "https://www.bls.gov/feed/bls_latest.rss"},
-    {"source": "Treasury Press",        "tier": "primary", "lean": "data",   "url": "https://home.treasury.gov/system/files/126/press_releases.xml"},
-    {"source": "SEC Press",             "tier": "primary", "lean": "data",   "url": "https://www.sec.gov/news/pressreleases.rss"},
-    {"source": "BEA News",              "tier": "primary", "lean": "data",   "url": "https://www.bea.gov/rss.xml"},
-
-    {"source": "NPR Business",          "tier": "press",   "lean": "left",   "url": "https://feeds.npr.org/1006/rss.xml"},
-    {"source": "Guardian Business",     "tier": "press",   "lean": "left",   "url": "https://www.theguardian.com/uk/business/rss"},
-    {"source": "CNBC Top News",         "tier": "press",   "lean": "center", "url": "https://www.cnbc.com/id/100003114/device/rss/rss.html"},
-    {"source": "CNBC Markets",          "tier": "press",   "lean": "center", "url": "https://www.cnbc.com/id/20910258/device/rss/rss.html"},
-    {"source": "MarketWatch",           "tier": "press",   "lean": "center", "url": "https://feeds.content.dowjones.io/public/rss/mw_topstories"},
-    {"source": "Yahoo Finance",         "tier": "press",   "lean": "center", "url": "https://finance.yahoo.com/news/rssindex"},
-    {"source": "Fox Business",          "tier": "press",   "lean": "right",  "url": "https://moxie.foxbusiness.com/google-publisher/markets.xml"},
-    {"source": "Washington Times Biz",  "tier": "press",   "lean": "right",  "url": "https://www.washingtontimes.com/rss/headlines/news/business/"},
-    {"source": "BBC Business",          "tier": "press",   "lean": "intl",   "url": "https://feeds.bbci.co.uk/news/business/rss.xml"},
-    {"source": "Al Jazeera",            "tier": "press",   "lean": "intl",   "url": "https://www.aljazeera.com/xml/rss/all.xml"},
-    {"source": "DW Business",           "tier": "press",   "lean": "intl",   "url": "https://rss.dw.com/xml/rss-en-bus"},
-
-    {"source": "CoinDesk",              "tier": "press",   "lean": "crypto", "url": "https://www.coindesk.com/arc/outboundfeeds/rss/"},
-    {"source": "Cointelegraph",         "tier": "press",   "lean": "crypto", "url": "https://cointelegraph.com/rss"},
-    {"source": "Bitcoin Magazine",      "tier": "press",   "lean": "crypto", "url": "https://bitcoinmagazine.com/feed"}
+    {
+      "source": "Federal Reserve",
+      "tier": "primary",
+      "lean": "data",
+      "url": "https://www.federalreserve.gov/feeds/press_all.xml"
+    },
+    {
+      "source": "Fed - Monetary Policy",
+      "tier": "primary",
+      "lean": "data",
+      "url": "https://www.federalreserve.gov/feeds/press_monetary.xml"
+    },
+    {
+      "source": "SEC Press",
+      "tier": "primary",
+      "lean": "data",
+      "url": "https://www.sec.gov/news/pressreleases.rss"
+    },
+    {
+      "source": "NPR Business",
+      "tier": "press",
+      "lean": "left",
+      "url": "https://feeds.npr.org/1006/rss.xml"
+    },
+    {
+      "source": "Guardian Business",
+      "tier": "press",
+      "lean": "left",
+      "url": "https://www.theguardian.com/uk/business/rss"
+    },
+    {
+      "source": "CNBC Top News",
+      "tier": "press",
+      "lean": "center",
+      "url": "https://www.cnbc.com/id/100003114/device/rss/rss.html"
+    },
+    {
+      "source": "CNBC Markets",
+      "tier": "press",
+      "lean": "center",
+      "url": "https://www.cnbc.com/id/20910258/device/rss/rss.html"
+    },
+    {
+      "source": "MarketWatch",
+      "tier": "press",
+      "lean": "center",
+      "url": "https://feeds.content.dowjones.io/public/rss/mw_topstories"
+    },
+    {
+      "source": "Yahoo Finance",
+      "tier": "press",
+      "lean": "center",
+      "url": "https://finance.yahoo.com/news/rssindex"
+    },
+    {
+      "source": "Fox Business",
+      "tier": "press",
+      "lean": "right",
+      "url": "https://moxie.foxbusiness.com/google-publisher/markets.xml"
+    },
+    {
+      "source": "BBC Business",
+      "tier": "press",
+      "lean": "intl",
+      "url": "https://feeds.bbci.co.uk/news/business/rss.xml"
+    },
+    {
+      "source": "Al Jazeera",
+      "tier": "press",
+      "lean": "intl",
+      "url": "https://www.aljazeera.com/xml/rss/all.xml"
+    },
+    {
+      "source": "DW Business",
+      "tier": "press",
+      "lean": "intl",
+      "url": "https://rss.dw.com/xml/rss-en-bus"
+    },
+    {
+      "source": "CoinDesk",
+      "tier": "press",
+      "lean": "crypto",
+      "url": "https://www.coindesk.com/arc/outboundfeeds/rss/"
+    },
+    {
+      "source": "Cointelegraph",
+      "tier": "press",
+      "lean": "crypto",
+      "url": "https://cointelegraph.com/rss"
+    }
   ],
   "keywords_important": [
-    "fed", "fomc", "rate", "inflation", "cpi", "ppi", "jobs", "payroll",
-    "unemployment", "gdp", "recession", "tariff", "treasury", "yield",
-    "earnings", "guidance", "default", "downgrade", "sanction", "opec",
-    "etf", "sec", "halving", "liquidation"
+    "fed",
+    "fomc",
+    "rate",
+    "inflation",
+    "cpi",
+    "ppi",
+    "jobs",
+    "payroll",
+    "unemployment",
+    "gdp",
+    "recession",
+    "tariff",
+    "treasury",
+    "yield",
+    "earnings",
+    "guidance",
+    "default",
+    "downgrade",
+    "sanction",
+    "opec",
+    "etf",
+    "sec",
+    "halving",
+    "liquidation"
   ]
 }
