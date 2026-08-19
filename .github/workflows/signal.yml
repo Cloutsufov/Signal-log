@@ -1,0 +1,92 @@
+name: signal log
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "What to do"
+        type: choice
+        default: bootstrap
+        options:
+          - bootstrap
+          - fetch
+          - record
+          - doctor
+      symbol:
+        description: "Symbol (only used by 'record')"
+        type: choice
+        default: SPY
+        options: [SPY, QQQ, IWM, BTC-USD, ETH-USD]
+      call_json:
+        description: 'Only for "record" - paste Claude JSON'
+        required: false
+        type: string
+  schedule:
+    - cron: "30 12 * * 1-5"
+    - cron: "30 13 * * 1-5"
+    - cron: "30 20 * * 1-5"
+    - cron: "30 21 * * 1-5"
+    - cron: "*/30 * * * *"
+    - cron: "17 12 * * 1"
+
+concurrency:
+  group: signal-db
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Repair layout if the upload nested everything in a subfolder
+        run: |
+          set -e
+          if [ -f scripts/run_job.py ]; then
+            echo "Layout OK - scripts/ is at the repo root."
+            exit 0
+          fi
+          echo "scripts/run_job.py not found at root. Looking for it nested..."
+          found=$(find . -mindepth 3 -maxdepth 4 -type f -name run_job.py \
+                    -path '*/scripts/*' -not -path './.git/*' | head -1)
+          if [ -z "$found" ]; then
+            echo "::error::Could not find scripts/run_job.py anywhere in this repo."
+            exit 1
+          fi
+          root=$(dirname "$(dirname "$found")")
+          echo "Found the project in '$root' - moving it to the repo root."
+          cp -r "$root"/. .
+          rm -rf "$root"
+          echo "Moved. Repo root now:"
+          ls -1
+
+      - name: Run
+        env:
+          ACTION: ${{ github.event.inputs.action }}
+          SCHEDULE: ${{ github.event.schedule }}
+          SYMBOL: ${{ github.event.inputs.symbol }}
+          CALL_JSON: ${{ github.event.inputs.call_json }}
+        run: |
+          set -o pipefail
+          python3 scripts/run_job.py 2>&1 | tee job_output.txt
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name  "signal-log-bot"
+          git config user.email "actions@github.com"
+          git add -A
+          git diff --staged --quiet || git commit -m "${{ github.event.inputs.action || 'scheduled' }} $(date -u +%FT%TZ)"
+          git pull --rebase --autostash || true
+          git push
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "### Run output" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat job_output.txt >> $GITHUB_STEP_SUMMARY 2>/dev/null || true
+          echo '```' >> $GITHUB_STEP_SUMMARY
