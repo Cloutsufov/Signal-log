@@ -1,5 +1,13 @@
 name: signal log
 
+# KWAN: ONE file. Every schedule and every button lives here, and all the
+# branching happens in scripts/run_job.py where it can be tested.
+#
+# If you ever hand-create this file in GitHub's web editor, this is the only
+# workflow file you need. Add file -> Create new file -> type the path
+# ".github/workflows/signal.yml" (typing the path creates the folders, which is
+# how you get around browsers hiding dot-folders) -> paste this -> commit.
+
 on:
   workflow_dispatch:
     inputs:
@@ -8,26 +16,40 @@ on:
         type: choice
         default: bootstrap
         options:
-          - bootstrap
-          - fetch
-          - record
-          - doctor
+          - bootstrap      # first run: probe sources, prune dead feeds, pull everything
+          - fetch          # pull prices + news + score now
+          - record         # record a call (fill in symbol + call_json below)
+          - doctor         # health check only
       symbol:
         description: "Symbol (only used by 'record')"
         type: choice
         default: SPY
         options: [SPY, QQQ, IWM, BTC-USD, ETH-USD]
-      call_json:
-        description: 'Only for "record" - paste Claude JSON'
+      direction:
+        description: "record only - which way"
+        type: choice
+        default: flat
+        options: [flat, up, down]
+      confidence:
+        description: "record only - 1 to 5"
+        type: choice
+        default: "3"
+        options: ["1", "2", "3", "4", "5"]
+      rationale:
+        description: "record only - why, in one line, citing numbers"
+        required: false
+        type: string
+      invalidation:
+        description: "record only - what would prove this wrong"
         required: false
         type: string
   schedule:
-    - cron: "30 12 * * 1-5"
-    - cron: "30 13 * * 1-5"
-    - cron: "30 20 * * 1-5"
-    - cron: "30 21 * * 1-5"
-    - cron: "*/30 * * * *"
-    - cron: "17 12 * * 1"
+    - cron: "30 12 * * 1-5"   # 08:30 ET pre-market (EDT = UTC-4)
+    - cron: "30 13 * * 1-5"   # 08:30 ET pre-market (EST = UTC-5)
+    - cron: "30 20 * * 1-5"   # 16:30 ET post-close (EDT)
+    - cron: "30 21 * * 1-5"   # 16:30 ET post-close (EST)
+    - cron: "*/30 * * * *"    # crypto + news + scoring, 24/7
+    - cron: "17 12 * * 1"     # weekly source health check
 
 concurrency:
   group: signal-db
@@ -43,6 +65,10 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Repair layout if the upload nested everything in a subfolder
+        # KWAN: uploading a zip through the GitHub web UI very often lands the
+        # whole project one level deep (repo/ship-room/scripts/...). GitHub only
+        # looks for workflows at the root, and none of the paths below resolve.
+        # Rather than make you diagnose that, the job fixes it once and commits.
         run: |
           set -e
           if [ -f scripts/run_job.py ]; then
@@ -54,24 +80,47 @@ jobs:
                     -path '*/scripts/*' -not -path './.git/*' | head -1)
           if [ -z "$found" ]; then
             echo "::error::Could not find scripts/run_job.py anywhere in this repo."
+            echo "The code did not upload. See SETUP.md step 1."
             exit 1
           fi
           root=$(dirname "$(dirname "$found")")
           echo "Found the project in '$root' - moving it to the repo root."
+          # cp -r merges into existing dirs (.github already exists here);
+          # a plain mv would collide on it.
           cp -r "$root"/. .
           rm -rf "$root"
           echo "Moved. Repo root now:"
           ls -1
 
       - name: Run
+        id: job
         env:
           ACTION: ${{ github.event.inputs.action }}
           SCHEDULE: ${{ github.event.schedule }}
           SYMBOL: ${{ github.event.inputs.symbol }}
-          CALL_JSON: ${{ github.event.inputs.call_json }}
+          # RIOS: all free text arrives as env vars, never interpolated into a
+          # shell command. It is arbitrary input and it does not go near a
+          # shell parser.
+          CALL_DIRECTION: ${{ github.event.inputs.direction }}
+          CALL_CONFIDENCE: ${{ github.event.inputs.confidence }}
+          CALL_RATIONALE: ${{ github.event.inputs.rationale }}
+          CALL_INVALIDATION: ${{ github.event.inputs.invalidation }}
         run: |
           set -o pipefail
           python3 scripts/run_job.py 2>&1 | tee job_output.txt
+
+      - name: Write HEALTH.md
+        if: always()
+        run: |
+          {
+            echo "# Last run"
+            echo
+            echo "\`$(date -u +'%Y-%m-%d %H:%M UTC')\` · trigger: \`${{ github.event.inputs.action || github.event.schedule || 'push' }}\`"
+            echo
+            echo '```'
+            cat job_output.txt 2>/dev/null || echo "(no output captured)"
+            echo '```'
+          } > HEALTH.md
 
       - name: Commit
         if: always()
@@ -90,3 +139,4 @@ jobs:
           echo '```' >> $GITHUB_STEP_SUMMARY
           cat job_output.txt >> $GITHUB_STEP_SUMMARY 2>/dev/null || true
           echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "Pages: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/" >> $GITHUB_STEP_SUMMARY
