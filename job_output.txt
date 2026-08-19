@@ -1,12 +1,19 @@
 trigger: action=record schedule=(none)
-ET now:  2026-08-18 22:37 (postclose)
+ET now:  2026-08-18 22:39 (postclose)
 plan:    2 step(s)
   - __record__
   - build_site.py
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/fetch_market.py --class crypto --symbols BTC-USD
-  ok  BTC-USD: 64352.165 via coinbase (+0.48%)
+  ok  BTC-USD: 64346.665 via coinbase (+0.47%)
 
 $ record_call.py --symbol BTC-USD --json <pasted>
-could not parse call JSON: no JSON object found in input
-FATAL: the call was not recorded
+recorded call #1: BTC-USD flat conf=3 spot=64346.665
+  no ref contract (flat call or no chain) - will score on spot only
+
+$ /home/runner/work/Signal-log/Signal-log/scripts/build_site.py
+wrote docs/index.html (14,097 bytes)
+wrote docs/record.html (7,747 bytes)
+wrote docs/news.html (38,176 bytes)
+
+done
