@@ -312,6 +312,7 @@ def freshness_banner(con, cfg: dict) -> str:
               [(s, "crypto") for s in cfg["crypto"]]
     budget = cfg["freshness_budget_minutes"]
 
+    parked = cfg.get("equities_parked") or []
     missing = [s for s, _ in tracked if s not in latest]
     if missing:
         return (f'<div class="banner crit"><span>✕</span><span>NO DATA for '
@@ -610,12 +611,13 @@ def scoring_mode_banner(con) -> str:
                     "WHERE chain_json IS NOT NULL").fetchone()["n"]
     if n:
         return ""
-    return ('<div class="banner warn"><span>⚠</span><span>DIRECTION-ONLY '
-            'SCORING — no option chain data is available, so calls are graded '
-            'on whether spot moved the right way and nothing else. That is the '
-            'flattering half of the measurement: you can be right on direction '
-            'and still lose money to theta and the spread. Treat every hit rate '
-            'below as an upper bound.</span></div>')
+    return ('<div class="banner warn"><span>⚠</span><span>Direction-only '
+            'scoring — no option chain source is connected, so hit rates below '
+            'are an upper bound.<br><span style="font-weight:400">Being right '
+            'on direction and still losing to theta and the spread is the '
+            'normal case; without chain data this page cannot see that. This '
+            'notice clears itself the moment chain data arrives.</span>'
+            '</span></div>')
 
 
 def page_index(con, cfg: dict) -> str:
@@ -746,6 +748,14 @@ def page_index(con, cfg: dict) -> str:
 
     # markets - now driven by the TRACKED list, so a missing symbol is visible
     body.append(h2(7, "Markets"))
+    parked = cfg.get("equities_parked") or []
+    if parked:
+        body.append(f'<div class="card muted">Parked: {e(", ".join(parked))}. '
+                    f'Every free keyless equity source rejects this server\'s '
+                    f'IP (HTTP 429), so they are not tracked rather than tracked '
+                    f'and permanently broken. The equity and option-chain code '
+                    f'is untouched — move them back into <code>equities</code> '
+                    f'in <code>config.json</code> once a quote key exists.</div>')
     tracked = [(s, "equity") for s in cfg["equities"]] + \
               [(s, "crypto") for s in cfg["crypto"]]
     for sym, cls in tracked:

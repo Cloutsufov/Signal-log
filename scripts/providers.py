@@ -262,12 +262,58 @@ def parse_coinbase_spot(payload: dict) -> dict:
         raise FetchError(f"unexpected Coinbase shape: {e}") from e
 
 
+def parse_coinbase_stats(payload: dict) -> dict:
+    """Exchange /stats gives the 24h open, which is the closest honest thing
+    crypto has to a 'previous close'."""
+    op = (payload or {}).get("open")
+    if op is None:
+        raise FetchError("coinbase stats has no open")
+    return {"prev_close": float(op),
+            "high": float(payload["high"]) if payload.get("high") else None,
+            "low": float(payload["low"]) if payload.get("low") else None}
+
+
+def parse_coinbase_candles(rows: list) -> list[float]:
+    """Exchange /candles rows are [time, low, high, open, close, volume],
+    newest first. Return closes oldest-first."""
+    if not isinstance(rows, list) or not rows:
+        raise FetchError("coinbase candles returned nothing")
+    out = []
+    for r in rows:
+        if isinstance(r, list) and len(r) >= 5:
+            out.append((int(r[0]), float(r[4])))
+    if not out:
+        raise FetchError("coinbase candles had no usable rows")
+    out.sort()
+    return [c for _, c in out]
+
+
+def coinbase_daily_closes(pair: str, days: int = 30) -> list[float]:
+    """Real daily history, free, no key.
+
+    MARA: the first live prompt went out with two data points 35 minutes apart
+    and 'Day change: n/a', because the spot endpoint returns a price and
+    nothing else. A directional call made from that is a coin flip wearing a
+    rationale, and it would have gone into the log as row 1 and stayed there.
+    Candles give us actual daily closes from the moment the system starts,
+    instead of waiting a month for our own snapshots to accumulate.
+    """
+    url = (f"https://api.exchange.coinbase.com/products/{pair}/candles"
+           f"?granularity=86400")
+    return parse_coinbase_candles(http_json(url))[-days:]
+
+
 def coinbase_quote(pair: str) -> dict:
-    """pair like BTC-USD. Official, documented, free, no key. Most reliable
-    thing in this whole file."""
-    url = f"https://api.coinbase.com/v2/prices/{pair}/spot"
-    q = parse_coinbase_spot(http_json(url))
+    """pair like BTC-USD. Official, documented, free, no key. The only thing in
+    this file that has never once failed from CI."""
+    q = parse_coinbase_spot(http_json(
+        f"https://api.coinbase.com/v2/prices/{pair}/spot"))
     q["provider"] = "coinbase"
+    try:  # best-effort: a missing 24h open is not worth failing the snapshot
+        q.update(parse_coinbase_stats(http_json(
+            f"https://api.exchange.coinbase.com/products/{pair}/stats")))
+    except Exception:  # noqa: BLE001
+        pass
     return q
 
 

@@ -21,6 +21,7 @@ import os
 import sys
 
 from common import db, ROOT, to_et
+import providers as P
 
 OUT = os.path.join(ROOT, "PROMPT.md")
 
@@ -113,10 +114,35 @@ def main() -> int:
               file=sys.stderr)
         return 1
 
-    hist = con.execute(
-        """SELECT ts_utc, spot FROM snapshots WHERE symbol=?
-           ORDER BY id DESC LIMIT 10""", (a.symbol,)).fetchall()
-    history = "\n".join(f"- {h['ts_utc'][:16]}Z  {h['spot']}" for h in hist)
+    # Real daily closes where the provider can give them, our own snapshots
+    # otherwise. A prompt built on two intraday points 35 minutes apart is not
+    # a prompt, it is a coin flip with a rationale attached.
+    history, hist_note = "", ""
+    if s["asset_class"] == "crypto":
+        try:
+            closes = P.coinbase_daily_closes(a.symbol, days=14)
+            if len(closes) >= 5:
+                history = "\n".join(f"- day -{len(closes) - 1 - i}: {c:,.2f}"
+                                    for i, c in enumerate(closes))
+                chg = (closes[-1] - closes[-2]) / closes[-2] * 100
+                rng = (max(closes) - min(closes)) / min(closes) * 100
+                hist_note = (f"\n\nLast close-to-close: {chg:+.2f}%. "
+                             f"{len(closes)}-day range: {rng:.1f}% "
+                             f"(low {min(closes):,.2f}, high {max(closes):,.2f}).")
+        except Exception as ex:  # noqa: BLE001
+            hist_note = f"\n\n(daily history unavailable: {type(ex).__name__})"
+
+    if not history:
+        hist = con.execute(
+            """SELECT ts_utc, spot FROM snapshots WHERE symbol=?
+               ORDER BY id DESC LIMIT 12""", (a.symbol,)).fetchall()
+        history = "\n".join(f"- {h['ts_utc'][:16]}Z  {h['spot']}" for h in hist)
+        if len(hist) < 5:
+            hist_note = ("\n\nWARNING: fewer than 5 observations exist. There "
+                         "is not enough history here to support a confident "
+                         "call. Confidence above 2 is not justifiable from this "
+                         "data, and 'flat' is the honest answer.")
+    history += hist_note
 
     sl = json.loads(s["chain_json"]) if s["chain_json"] else None
     note, chain = fmt_chain(sl)

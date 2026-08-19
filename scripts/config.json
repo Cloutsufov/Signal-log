@@ -8,13 +8,10 @@
     "equities is already more than one person can honestly track daily. If you",
     "add more, expect the extra calls to be worse, not better - you'll be",
     "spending the same judgment across more surface.",
-    "primary_symbol switched to BTC-USD after the live run: every free keyless equity source returns HTTP 429 from a GitHub runner, while Coinbase serves crypto happily. Crypto also runs 24/7, so you accumulate scored calls about 5x faster than two equity snapshots a day. Switch back to SPY the moment a quote key is in place."
+    "primary_symbol switched to BTC-USD after the live run: every free keyless equity source returns HTTP 429 from a GitHub runner, while Coinbase serves crypto happily. Crypto also runs 24/7, so you accumulate scored calls about 5x faster than two equity snapshots a day. Switch back to SPY the moment a quote key is in place.",
+    "equities moved to equities_parked. NOT deleted - parked. Every free keyless equity source 429s from a GitHub runner, so claiming to track SPY while never fetching it was the page lying to you. Move them back into 'equities' the moment a quote key exists; all the equity and option code is untouched and still tested."
   ],
-  "equities": [
-    "SPY",
-    "QQQ",
-    "IWM"
-  ],
+  "equities": [],
   "crypto": [
     "BTC-USD",
     "ETH-USD"
@@ -23,5 +20,10 @@
   "freshness_budget_minutes": {
     "equity": 1800,
     "crypto": 120
-  }
+  },
+  "equities_parked": [
+    "SPY",
+    "QQQ",
+    "IWM"
+  ]
 }
