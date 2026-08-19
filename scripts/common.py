@@ -103,17 +103,30 @@ def market_session(dt_utc: datetime | None = None) -> str:
 # ---------------------------------------------------------------- http
 
 class FetchError(RuntimeError):
-    pass
+    """Carries the HTTP status when there was one.
+
+    KWAN: v1 collapsed every failure into one string, so "the host is down",
+    "we got rate limited", and "they now require a cookie" all looked identical
+    in the logs. From a GitHub runner those are completely different problems
+    with completely different fixes - a datacenter IP getting a 429 or a 401 is
+    the single most likely reason a free endpoint works on your laptop and
+    fails in CI. The status code is the diagnosis.
+    """
+
+    def __init__(self, msg: str, status: int | None = None):
+        super().__init__(msg)
+        self.status = status
 
 
 def http_get(url: str, *, timeout: int = 20, headers: dict | None = None,
              retries: int = 3, backoff: float = 1.5) -> bytes:
     """GET with retries. Raises FetchError loudly rather than returning junk."""
-    hdrs = {"User-Agent": UA, "Accept": "*/*", "Accept-Encoding": "gzip"}
+    hdrs = {"User-Agent": UA, "Accept": "*/*", "Accept-Encoding": "gzip",
+            "Accept-Language": "en-US,en;q=0.9"}
     if headers:
         hdrs.update(headers)
     ctx = ssl.create_default_context()
-    last = None
+    last, status = None, None
     for attempt in range(retries):
         try:
             req = urllib.request.Request(url, headers=hdrs)
@@ -122,11 +135,22 @@ def http_get(url: str, *, timeout: int = 20, headers: dict | None = None,
                 if r.headers.get("Content-Encoding") == "gzip":
                     raw = gzip.GzipFile(fileobj=io.BytesIO(raw)).read()
                 return raw
-        except Exception as e:  # noqa: BLE001 - we re-raise as FetchError
-            last = e
-            if attempt < retries - 1:
-                time.sleep(backoff ** (attempt + 1))
-    raise FetchError(f"GET {url} failed after {retries} tries: {last}")
+        except urllib.error.HTTPError as e:
+            last, status = e, e.code
+            body = ""
+            try:
+                body = e.read()[:200].decode("utf-8", "replace").replace("\n", " ")
+            except Exception:  # noqa: BLE001
+                pass
+            last = f"HTTP {e.code} {e.reason}" + (f" :: {body}" if body else "")
+            # 401/403/404/429 will not fix themselves on a retry
+            if status in (401, 403, 404, 429):
+                break
+        except Exception as e:  # noqa: BLE001 - re-raised as FetchError
+            last = f"{type(e).__name__}: {e}"
+        if attempt < retries - 1:
+            time.sleep(backoff ** (attempt + 1))
+    raise FetchError(f"GET {url} failed: {last}", status)
 
 
 def http_json(url: str, **kw) -> dict:

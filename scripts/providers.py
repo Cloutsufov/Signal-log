@@ -43,11 +43,11 @@ def parse_yahoo_chart(payload: dict) -> dict:
     }
 
 
-def yahoo_quote(symbol: str) -> dict:
-    url = (f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}"
+def yahoo_quote(symbol: str, host: str = "query1") -> dict:
+    url = (f"https://{host}.finance.yahoo.com/v8/finance/chart/{symbol}"
            f"?range=5d&interval=1d")
     q = parse_yahoo_chart(http_json(url))
-    q["provider"] = "yahoo"
+    q["provider"] = f"yahoo-{host}"
     return q
 
 
@@ -79,6 +79,37 @@ def stooq_quote(symbol: str) -> dict:
     return q
 
 
+def parse_stooq_light(text: str) -> dict:
+    """Stooq's single-quote CSV: Symbol,Date,Time,Open,High,Low,Close,Volume.
+
+    A different endpoint from the daily-history one, and it fails differently -
+    when Stooq has no data it returns literal 'N/D' rather than an HTTP error,
+    which would otherwise sail through as a float() crash.
+    """
+    rows = list(csv.DictReader(io.StringIO(text.strip())))
+    if not rows:
+        raise FetchError("stooq light returned no rows")
+    r = rows[0]
+    close = (r.get("Close") or "").strip()
+    if not close or close.upper() in ("N/D", "N/A"):
+        raise FetchError(f"stooq light has no data for this symbol (got {close!r})")
+    op = (r.get("Open") or "").strip()
+    return {"spot": float(close),
+            "prev_close": float(op) if op and op.upper() not in ("N/D", "N/A") else None,
+            "currency": "USD", "exchange": "stooq-light",
+            "ts": f"{r.get('Date', '')} {r.get('Time', '')}".strip()}
+
+
+def stooq_light_quote(symbol: str) -> dict:
+    sym = symbol.lower()
+    if not sym.endswith(".us") and "-" not in sym:
+        sym += ".us"
+    url = f"https://stooq.com/q/l/?s={sym}&f=sd2t2ohlcv&h&e=csv"
+    q = parse_stooq_light(http_get(url).decode("utf-8", "replace"))
+    q["provider"] = "stooq-light"
+    return q
+
+
 def parse_coinbase_spot(payload: dict) -> dict:
     try:
         return {"spot": float(payload["data"]["amount"]),
@@ -100,18 +131,26 @@ def coinbase_quote(pair: str) -> dict:
 def get_quote(symbol: str, asset_class: str) -> dict:
     """Try providers in order. Record which one answered. Raise only if all fail."""
     if asset_class == "crypto":
-        chain = [lambda: coinbase_quote(symbol.replace("-USD", "") + "-USD"),
-                 lambda: yahoo_quote(symbol)]
+        chain = [("coinbase", lambda: coinbase_quote(symbol.replace("-USD", "") + "-USD")),
+                 ("yahoo-q1", lambda: yahoo_quote(symbol)),
+                 ("yahoo-q2", lambda: yahoo_quote(symbol, "query2"))]
     else:
-        chain = [lambda: yahoo_quote(symbol),
-                 lambda: stooq_quote(symbol)]
+        # Four providers, because the first real run from a GitHub runner
+        # showed the equity rail failing where crypto and news both worked.
+        # A datacenter IP is treated very differently from a home IP by these
+        # free endpoints, so we try more than one host and more than one shape.
+        chain = [("yahoo-q1", lambda: yahoo_quote(symbol)),
+                 ("yahoo-q2", lambda: yahoo_quote(symbol, "query2")),
+                 ("stooq-light", lambda: stooq_light_quote(symbol)),
+                 ("stooq-daily", lambda: stooq_quote(symbol))]
 
     errors = []
-    for fn in chain:
+    for name, fn in chain:
         try:
             return fn()
-        except Exception as e:  # noqa: BLE001
-            errors.append(str(e))
+        except Exception as ex:  # noqa: BLE001
+            code = getattr(ex, "status", None)
+            errors.append(f"{name}: " + (f"HTTP {code}" if code else str(ex)[:120]))
     raise FetchError(f"all providers failed for {symbol}: " + " | ".join(errors))
 
 

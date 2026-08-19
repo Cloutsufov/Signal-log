@@ -9,124 +9,211 @@
     "      probably solid. Where they diverge, that IS the interesting signal.",
     "Run `python3 scripts/doctor.py` to see which of these are actually alive.",
     "Feeds die constantly - Reuters and AP both retired public RSS. Delete dead",
-    "ones rather than letting them fail silently every 30 minutes."
+    "ones rather than letting them fail silently every 30 minutes.",
+    "filter:true = a GENERAL news feed. Items must match a keywords_important term to be stored. Added after the first live run filled the rail with an Ebola outbreak and a football transfer."
   ],
   "feeds": [
     {
       "source": "Federal Reserve",
       "tier": "primary",
       "lean": "data",
-      "url": "https://www.federalreserve.gov/feeds/press_all.xml"
+      "url": "https://www.federalreserve.gov/feeds/press_all.xml",
+      "filter": false
     },
     {
       "source": "Fed - Monetary Policy",
       "tier": "primary",
       "lean": "data",
-      "url": "https://www.federalreserve.gov/feeds/press_monetary.xml"
+      "url": "https://www.federalreserve.gov/feeds/press_monetary.xml",
+      "filter": false
+    },
+    {
+      "source": "BLS Releases",
+      "tier": "primary",
+      "lean": "data",
+      "url": "https://www.bls.gov/feed/bls_latest.rss",
+      "filter": false
+    },
+    {
+      "source": "Treasury Press",
+      "tier": "primary",
+      "lean": "data",
+      "url": "https://home.treasury.gov/system/files/126/press_releases.xml",
+      "filter": false
     },
     {
       "source": "SEC Press",
       "tier": "primary",
       "lean": "data",
-      "url": "https://www.sec.gov/news/pressreleases.rss"
+      "url": "https://www.sec.gov/news/pressreleases.rss",
+      "filter": false
+    },
+    {
+      "source": "BEA News",
+      "tier": "primary",
+      "lean": "data",
+      "url": "https://www.bea.gov/rss.xml",
+      "filter": false
     },
     {
       "source": "NPR Business",
       "tier": "press",
       "lean": "left",
-      "url": "https://feeds.npr.org/1006/rss.xml"
+      "url": "https://feeds.npr.org/1006/rss.xml",
+      "filter": false
     },
     {
       "source": "Guardian Business",
       "tier": "press",
       "lean": "left",
-      "url": "https://www.theguardian.com/uk/business/rss"
+      "url": "https://www.theguardian.com/uk/business/rss",
+      "filter": false
     },
     {
       "source": "CNBC Top News",
       "tier": "press",
       "lean": "center",
-      "url": "https://www.cnbc.com/id/100003114/device/rss/rss.html"
+      "url": "https://www.cnbc.com/id/100003114/device/rss/rss.html",
+      "filter": true
     },
     {
       "source": "CNBC Markets",
       "tier": "press",
       "lean": "center",
-      "url": "https://www.cnbc.com/id/20910258/device/rss/rss.html"
+      "url": "https://www.cnbc.com/id/20910258/device/rss/rss.html",
+      "filter": false
     },
     {
       "source": "MarketWatch",
       "tier": "press",
       "lean": "center",
-      "url": "https://feeds.content.dowjones.io/public/rss/mw_topstories"
+      "url": "https://feeds.content.dowjones.io/public/rss/mw_topstories",
+      "filter": false
     },
     {
       "source": "Yahoo Finance",
       "tier": "press",
       "lean": "center",
-      "url": "https://finance.yahoo.com/news/rssindex"
+      "url": "https://finance.yahoo.com/news/rssindex",
+      "filter": false
     },
     {
       "source": "Fox Business",
       "tier": "press",
       "lean": "right",
-      "url": "https://moxie.foxbusiness.com/google-publisher/markets.xml"
+      "url": "https://moxie.foxbusiness.com/google-publisher/markets.xml",
+      "filter": false
+    },
+    {
+      "source": "Washington Times Biz",
+      "tier": "press",
+      "lean": "right",
+      "url": "https://www.washingtontimes.com/rss/headlines/news/business/",
+      "filter": false
     },
     {
       "source": "BBC Business",
       "tier": "press",
       "lean": "intl",
-      "url": "https://feeds.bbci.co.uk/news/business/rss.xml"
+      "url": "https://feeds.bbci.co.uk/news/business/rss.xml",
+      "filter": false
     },
     {
       "source": "Al Jazeera",
       "tier": "press",
       "lean": "intl",
-      "url": "https://www.aljazeera.com/xml/rss/all.xml"
+      "url": "https://www.aljazeera.com/xml/rss/all.xml",
+      "filter": true
     },
     {
       "source": "DW Business",
       "tier": "press",
       "lean": "intl",
-      "url": "https://rss.dw.com/xml/rss-en-bus"
+      "url": "https://rss.dw.com/xml/rss-en-bus",
+      "filter": false
     },
     {
       "source": "CoinDesk",
       "tier": "press",
       "lean": "crypto",
-      "url": "https://www.coindesk.com/arc/outboundfeeds/rss/"
+      "url": "https://www.coindesk.com/arc/outboundfeeds/rss/",
+      "filter": false
     },
     {
       "source": "Cointelegraph",
       "tier": "press",
       "lean": "crypto",
-      "url": "https://cointelegraph.com/rss"
+      "url": "https://cointelegraph.com/rss",
+      "filter": false
+    },
+    {
+      "source": "Bitcoin Magazine",
+      "tier": "press",
+      "lean": "crypto",
+      "url": "https://bitcoinmagazine.com/feed",
+      "filter": false
     }
   ],
   "keywords_important": [
+    "acquisition",
+    "bank",
+    "banks",
+    "bitcoin",
+    "bond",
+    "bonds",
+    "central bank",
+    "cpi",
+    "crude",
+    "crypto",
+    "default",
+    "dollar",
+    "dow",
+    "downgrade",
+    "earnings",
+    "economic",
+    "economy",
+    "equities",
+    "etf",
+    "ethereum",
     "fed",
     "fomc",
-    "rate",
-    "inflation",
-    "cpi",
-    "ppi",
-    "jobs",
-    "payroll",
-    "unemployment",
+    "futures",
     "gdp",
-    "recession",
-    "tariff",
-    "treasury",
-    "yield",
-    "earnings",
+    "gold",
     "guidance",
-    "default",
-    "downgrade",
-    "sanction",
-    "opec",
-    "etf",
-    "sec",
     "halving",
-    "liquidation"
+    "inflation",
+    "interest rate",
+    "investor",
+    "investors",
+    "ipo",
+    "jobs",
+    "layoff",
+    "layoffs",
+    "liquidation",
+    "market",
+    "markets",
+    "merger",
+    "nasdaq",
+    "oil",
+    "opec",
+    "payroll",
+    "ppi",
+    "profit",
+    "rate",
+    "recession",
+    "revenue",
+    "s&p",
+    "sanction",
+    "sec",
+    "stablecoin",
+    "stock",
+    "stocks",
+    "tariff",
+    "trader",
+    "trading",
+    "treasury",
+    "unemployment",
+    "yield"
   ]
 }

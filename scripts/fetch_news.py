@@ -100,12 +100,30 @@ def parse_feed(raw: bytes) -> list[dict]:
     return items
 
 
+def is_relevant(item: dict, keywords: list[str]) -> bool:
+    """Keyword gate for general-news feeds.
+
+    DEV: found this by actually reading the live page after the first real run.
+    Al Jazeera's `all.xml` and CNBC's top-news feed are *general* news, so the
+    rail filled up with an Ebola outbreak, a Gaza strike and a Jose Mourinho
+    transfer. None of that is a market signal, and worse, it buried the Treasury
+    yield story that actually mattered under football.
+
+    Feeds marked "filter": true in sources.json must match a market keyword to
+    be stored. Feeds that are already business-only (and every primary source)
+    are stored unfiltered - the Fed does not publish sports.
+    """
+    hay = f"{item.get('title', '')} {item.get('summary', '')}".lower()
+    return any(k in hay for k in keywords)
+
+
 def main() -> int:
     with open(SOURCES) as f:
         cfg = json.load(f)
+    keywords = [k.lower() for k in cfg.get("keywords_important", [])]
 
     con = db()
-    alive, dead, added = [], [], 0
+    alive, dead, added, filtered_out = [], [], 0, 0
 
     for feed in cfg["feeds"]:
         try:
@@ -120,6 +138,11 @@ def main() -> int:
         # run looked like it pulled 25 fresh headlines when almost all of them
         # were duplicates already in the table. cursor.rowcount is the real count.
         n = 0
+        if feed.get("filter") and keywords:
+            before = len(items)
+            items = [i for i in items if is_relevant(i, keywords)]
+            filtered_out += before - len(items)
+
         for it in items[:25]:
             try:
                 cur = con.execute(

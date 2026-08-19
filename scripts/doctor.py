@@ -33,8 +33,9 @@ def timed(label: str, fn) -> bool:
         return True
     except Exception as e:  # noqa: BLE001
         ms = int((time.time() - t0) * 1000)
-        msg = str(e)
-        print(f"  DEAD  {label:<34} {ms:>5}ms  {type(e).__name__}: {msg[:90]}")
+        code = getattr(e, "status", None)
+        tag = f"HTTP {code}" if code else type(e).__name__
+        print(f"  DEAD  {label:<34} {ms:>5}ms  {tag}: {str(e)[:110]}")
         return False
 
 
@@ -76,10 +77,14 @@ def main() -> int:
     print("=== quotes ===")
     ok = total = 0
     for sym in equities:
-        total += 2
-        ok += timed(f"yahoo chart {sym}",
+        total += 4
+        ok += timed(f"yahoo q1 {sym}",
                     lambda s=sym: f"spot {P.yahoo_quote(s)['spot']}")
-        ok += timed(f"stooq eod {sym}",
+        ok += timed(f"yahoo q2 {sym}",
+                    lambda s=sym: f"spot {P.yahoo_quote(s, 'query2')['spot']}")
+        ok += timed(f"stooq light {sym}",
+                    lambda s=sym: f"spot {P.stooq_light_quote(s)['spot']}")
+        ok += timed(f"stooq daily {sym}",
                     lambda s=sym: f"close {P.stooq_quote(s)['spot']}")
     for sym in cryptos:
         total += 1
