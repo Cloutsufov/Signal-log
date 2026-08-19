@@ -105,13 +105,19 @@ next to Webull on a second screen.
 
 ## The daily loop, from your phone
 
-1. **Actions runs itself** at 8:30am and 4:30pm ET on weekdays. It snapshots
-   prices and writes `PROMPT.md`.
+1. **Actions runs itself** every 30 minutes. It snapshots BTC and ETH, pulls
+   news, scores anything that has matured, and rewrites `PROMPT.md`.
 2. **Open `PROMPT.md`** in the repo. Copy it. Paste into Claude.
-3. Claude replies with JSON.
-4. **Actions → signal log → Run workflow** → set action to **record**, pick the
-   symbol, paste the JSON, Run.
+3. Claude replies with a direction, a confidence, and one line of reasoning.
+4. **Actions → signal log → Run workflow** → action **record** → pick
+   **direction** and **confidence** from the dropdowns, type the two sentences,
+   Run. *(No JSON. A single-line web form eats pasted JSON, so the form doesn't
+   ask for any.)*
 5. Tomorrow's run scores it automatically and the Record page updates itself.
+
+**One open call per symbol.** A second call is refused while the first is
+still unscored — a duplicated call double-counts one opinion and biases the
+record. Pass `--force` locally if you ever genuinely mean two.
 
 That's it. No terminal at any point.
 
@@ -125,16 +131,34 @@ There is **one workflow**, called **signal log**, with a dropdown.
 |---|---|
 | **bootstrap** | First run: probe every source, prune dead feeds, pull all prices + news, write the prompt, build the pages |
 | **fetch** | Pull everything and score, right now |
-| **record** | Record a call — set the symbol and paste Claude's JSON |
+| **record** | Record a call — symbol, direction and confidence dropdowns, two sentences |
 | **doctor** | Health check only; writes `HEALTH.md` |
 
 And it runs itself on a schedule:
 
 | When | What |
 |---|---|
-| weekdays 8:30am + 4:30pm ET | SPY/QQQ/IWM snapshot, scoring, prompt, rebuild |
-| every 30 min, 24/7 | BTC/ETH snapshot, news, scoring, rebuild |
+| every 30 min, 24/7 | BTC/ETH snapshot, news, scoring, prompt, rebuild |
+| weekdays 8:30am + 4:30pm ET | equity snapshot — **currently parked**, see below |
 | Mondays | source health check |
+
+### Why equities are parked
+
+Every free keyless equity source (Yahoo, Stooq) returns **HTTP 429 in ~50ms**
+from a GitHub Actions runner. That is the IP being rejected, not our traffic
+being throttled. Crypto works because Coinbase doesn't do that.
+
+SPY, QQQ and IWM therefore sit in `equities_parked` in `config.json`. They are
+disclosed on the page with the reason rather than claimed-and-broken. All the
+equity and option-chain code is untouched and still tested — move them back
+into `equities` the day a quote key exists.
+
+### What "direction-only scoring" means
+
+With no option chain there is no theta and no spread to measure, so a call is
+graded purely on whether spot moved the right way. That is the flattering half
+of the measurement, and the pages say so on every screen. It clears itself
+automatically the moment chain data arrives.
 
 ---
 
@@ -144,8 +168,10 @@ And it runs itself on a schedule:
 |---|---|---|
 | Every job fails at the push step | Workflow permissions | Step 2 above |
 | Pages 404 | Pages not enabled, or wrong folder | Step 4 — must be `/docs` |
-| Card says **PIPELINE DOWN** | A source died | Actions → doctor → Run workflow |
-| Boxes ②③④ empty | Yahoo's option chain endpoint is unavailable | Check `HEALTH.md`. Spot scoring still works; option P&L won't. |
+| Card says **PIPELINE DOWN** | A source died | Actions → signal log → action `doctor` |
+| Option context section says "unavailable" | No free chain source will serve this IP | Expected. Spot scoring still works; option P&L doesn't. |
+| A call is **REFUSED** | An earlier call on that symbol is still unscored | Correct behaviour — wait for it to mature |
+| The **LIVE** badge never appears | The browser couldn't reach Coinbase's socket | Display only; the log is unaffected |
 | Scheduled runs don't fire | GitHub delays or drops scheduled workflows under load, and disables schedules entirely on repos with ~60 days of no activity | Documented platform behaviour. Push any commit to re-arm. |
 | A feed you wanted got pruned | One bad run removed it | Revert that commit — it's one file |
 

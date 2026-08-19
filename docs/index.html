@@ -36,6 +36,12 @@ nav a:hover{text-decoration:none;color:var(--ink)}
  padding:3px 8px;border-radius:999px;border:1px solid var(--ring);color:var(--ink2);
  letter-spacing:.03em;white-space:nowrap}
 .dot{width:8px;height:8px;border-radius:50%;flex:none}
+.live{display:none;align-items:center;gap:5px;font-size:10px;font-weight:700;
+ letter-spacing:.08em;color:#7ee27e;background:rgba(12,163,12,.14);
+ border:1px solid rgba(12,163,12,.4);border-radius:999px;padding:2px 7px}
+.live i{width:6px;height:6px;border-radius:50%;background:#0ca30c;
+ animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
 .banner{border-radius:14px;padding:11px 13px;margin-bottom:12px;font-size:13px;
  font-weight:600;display:flex;gap:9px;align-items:flex-start;border:1px solid var(--ring)}
 .banner.ok{background:rgba(12,163,12,.12);color:#7ee27e}
@@ -90,7 +96,8 @@ details ol li{padding:7px 0;border-top:1px solid var(--grid);font-size:12.5px;
  color:var(--ink2);line-height:1.55}
 </style></head><body><div class="wrap">
 <div class="row"><h1>SIGNAL LOG</h1>
-<span class="muted">Wed Aug 19, 18:12 ET</span></div>
+<span class="muted">built 18:45 ET · now
+<span id="nowclock">--:--:--</span></span></div>
 <nav><a href="index.html" class="on">Signals</a><a href="record.html">Record</a><a href="news.html">News</a></nav>
 <div class="banner ok"><span>✓</span><span>All rails fresh — oldest tracked symbol is ETH-USD at 0 min.</span></div>
 <div class="banner warn"><span>⚠</span><span>Direction-only scoring — no option chain source is connected, so hit rates below are an upper bound.<br><span style="font-weight:400">Being right on direction and still losing to theta and the spread is the normal case; without chain data this page cannot see that. This notice clears itself the moment chain data arrives.</span></span></div>
@@ -135,12 +142,8 @@ symbol.</li>
                    padding-top:10px">Record: no scored BTC-USD calls yet — this call is unproven —
                    <a href="record.html" style="color:var(--ink2)">see the full log →</a></div>
             </div>
-<h2><span class="mk">2</span>Already priced in — BTC-USD</h2>
-<div class="card muted">No option chain stored yet.</div>
-<h2><span class="mk">3</span>What this trade costs before it can win</h2>
-<div class="card muted">No open call with a reference contract on the primary symbol yet.</div>
-<h2><span class="mk">4</span>Volatility context</h2>
-<div class="card muted">Needs a stored option chain.</div>
+<h2><span class="mk">2</span>Option context — unavailable</h2>
+<div class="card muted">Expected move, breakeven and volatility context all need an option chain, and no free chain source will serve this server's IP. These three sections reappear automatically the moment chain data exists — nothing here is switched off, it is starved. Until then the call above is a bare directional guess and the record grades it as one.</div>
 <h2><span class="mk">6</span>Track record — the box that grades the others</h2>
 <div class="tiles">
       <div class="tile"><div class="label">Direction hit rate</div><div class="value">—</div><div class="muted" style="margin-top:6px">nothing scored yet</div></div>
@@ -150,30 +153,36 @@ symbol.</li>
 <div class="card muted">Parked: SPY, QQQ, IWM. Every free keyless equity source rejects this server's IP (HTTP 429), so they are not tracked rather than tracked and permanently broken. The equity and option-chain code is untouched — move them back into <code>equities</code> in <code>config.json</code> once a quote key exists.</div>
 
         <div class="card">
-          <div class="row"><strong>BTC-USD</strong>
-            <span class="muted" style="">
-              coinbase · 0m ago</span></div>
+          <div class="row"><strong>BTC-USD <span class="live" data-livebadge="BTC-USD"><i></i>LIVE</span></strong>
+            <span class="muted">coinbase · snapshot
+              <span data-ts="2026-08-19T22:45:06+00:00" data-budget="120">0m ago</span>
+            </span></div>
           <div class="row" style="margin-top:4px">
-            <span style="font-size:24px;font-weight:600">69,392.90</span>
+            <span style="font-size:24px;font-weight:600" data-live="BTC-USD"
+                  data-snapshot="69315.575">69,315.57</span>
             <span style="color:var(--up);font-weight:600">↑
-              +7.42%</span></div>
-          <svg viewBox="0 0 240 44" width="100%" height="44" role="img" aria-label="recent price trend, 24 points, low 64327.32 high 69849.88"><path d="M5.0,38.8 L15.0,39.0 L25.0,38.8 L35.0,38.2 L45.0,38.3 L55.0,38.3 L65.0,35.2 L75.0,34.8 L85.0,29.6 L95.0,9.8 L105.0,14.0 L115.0,12.3 L125.0,12.6 L135.0,14.8 L145.0,15.6 L155.0,15.4 L165.0,14.2 L175.0,14.8 L185.0,14.0 L195.0,12.5 L205.0,12.2 L215.0,7.7 L225.0,5.0 L235.0,7.8" fill="none" stroke="var(--up)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="235.0" cy="7.8" r="4" fill="var(--up)" stroke="var(--surface)" stroke-width="2"/></svg>
+              +7.31%</span></div>
+          <div class="row" style="margin-top:2px"><span class="muted" data-drift="BTC-USD"></span></div>
+          <svg viewBox="0 0 240 44" width="100%" height="44" role="img" aria-label="recent price trend, 24 points, low 64327.32 high 69849.88"><path d="M5.0,39.0 L15.0,38.8 L25.0,38.2 L35.0,38.3 L45.0,38.3 L55.0,35.2 L65.0,34.8 L75.0,29.6 L85.0,9.8 L95.0,14.0 L105.0,12.3 L115.0,12.6 L125.0,14.8 L135.0,15.6 L145.0,15.4 L155.0,14.2 L165.0,14.8 L175.0,14.0 L185.0,12.5 L195.0,12.2 L205.0,7.7 L215.0,5.0 L225.0,7.8 L235.0,8.3" fill="none" stroke="var(--up)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="235.0" cy="8.3" r="4" fill="var(--up)" stroke="var(--surface)" stroke-width="2"/></svg>
         </div>
 
         <div class="card">
-          <div class="row"><strong>ETH-USD</strong>
-            <span class="muted" style="">
-              coinbase · 0m ago</span></div>
+          <div class="row"><strong>ETH-USD <span class="live" data-livebadge="ETH-USD"><i></i>LIVE</span></strong>
+            <span class="muted">coinbase · snapshot
+              <span data-ts="2026-08-19T22:45:06+00:00" data-budget="120">0m ago</span>
+            </span></div>
           <div class="row" style="margin-top:4px">
-            <span style="font-size:24px;font-weight:600">2,274.05</span>
+            <span style="font-size:24px;font-weight:600" data-live="ETH-USD"
+                  data-snapshot="2257.195">2,257.20</span>
             <span style="color:var(--up);font-weight:600">↑
-              +18.92%</span></div>
-          <svg viewBox="0 0 240 44" width="100%" height="44" role="img" aria-label="recent price trend, 24 points, low 1916.58 high 2299.06"><path d="M5.0,38.9 L15.0,39.0 L25.0,38.9 L35.0,38.4 L45.0,38.6 L55.0,38.5 L65.0,37.1 L75.0,37.6 L85.0,34.1 L95.0,23.5 L105.0,24.4 L115.0,22.9 L125.0,23.9 L135.0,24.6 L145.0,23.8 L155.0,24.0 L165.0,23.6 L175.0,23.0 L185.0,22.8 L195.0,21.4 L205.0,20.1 L215.0,8.8 L225.0,5.0 L235.0,7.2" fill="none" stroke="var(--up)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="235.0" cy="7.2" r="4" fill="var(--up)" stroke="var(--surface)" stroke-width="2"/></svg>
+              +18.04%</span></div>
+          <div class="row" style="margin-top:2px"><span class="muted" data-drift="ETH-USD"></span></div>
+          <svg viewBox="0 0 240 44" width="100%" height="44" role="img" aria-label="recent price trend, 24 points, low 1916.58 high 2299.06"><path d="M5.0,39.0 L15.0,38.9 L25.0,38.4 L35.0,38.6 L45.0,38.5 L55.0,37.1 L65.0,37.6 L75.0,34.1 L85.0,23.5 L95.0,24.4 L105.0,22.9 L115.0,23.9 L125.0,24.6 L135.0,23.8 L145.0,24.0 L155.0,23.6 L165.0,23.0 L175.0,22.8 L185.0,21.4 L195.0,20.1 L205.0,8.8 L215.0,5.0 L225.0,7.2 L235.0,8.7" fill="none" stroke="var(--up)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="235.0" cy="8.7" r="4" fill="var(--up)" stroke="var(--surface)" stroke-width="2"/></svg>
         </div>
 <h2><span class="mk">8</span>Pipeline health</h2>
     <div class="card" style="padding:6px 14px 2px"><table>
     <thead><tr><th>when</th><th>job</th><th>status</th></tr></thead>
-    <tbody><tr><td>08-19T22:12</td><td>score</td><td style="color:var(--good)">ok</td></tr><tr><td>08-19T22:12</td><td>fetch_news</td><td style="color:var(--warn)">partial</td></tr><tr><td>08-19T22:12</td><td>fetch_market:crypto</td><td style="color:var(--good)">ok</td></tr><tr><td>08-19T21:46</td><td>score</td><td style="color:var(--good)">ok</td></tr><tr><td>08-19T21:46</td><td>fetch_news</td><td style="color:var(--warn)">partial</td></tr><tr><td>08-19T21:46</td><td>fetch_market:crypto</td><td style="color:var(--good)">ok</td></tr><tr><td>08-19T21:14</td><td>score</td><td style="color:var(--good)">ok</td></tr><tr><td>08-19T21:14</td><td>fetch_news</td><td style="color:var(--warn)">partial</td></tr></tbody>
+    <tbody><tr><td>08-19T22:45</td><td>score</td><td style="color:var(--good)">ok</td></tr><tr><td>08-19T22:45</td><td>fetch_news</td><td style="color:var(--warn)">partial</td></tr><tr><td>08-19T22:45</td><td>fetch_market:crypto</td><td style="color:var(--good)">ok</td></tr><tr><td>08-19T22:12</td><td>score</td><td style="color:var(--good)">ok</td></tr><tr><td>08-19T22:12</td><td>fetch_news</td><td style="color:var(--warn)">partial</td></tr><tr><td>08-19T22:12</td><td>fetch_market:crypto</td><td style="color:var(--good)">ok</td></tr><tr><td>08-19T21:46</td><td>score</td><td style="color:var(--good)">ok</td></tr><tr><td>08-19T21:46</td><td>fetch_news</td><td style="color:var(--warn)">partial</td></tr></tbody>
     </table></div>
 <h2>Watching this on another device</h2>
     <div class="card"><div class="muted">This page is a plain URL on GitHub
@@ -184,11 +193,125 @@ symbol.</li>
     It does <b>not</b> connect to a brokerage account, and it does not need to.
     Your broker shows you positions; this shows you whether the reasoning has
     been any good. Keep them side by side and let each do its job.</div></div>
+
+<script>
+/* DEV: the honest answer to "it feels slow".
+ *
+ * There are two different clocks in this system and v1 confused them:
+ *   1. the DISPLAY clock - what the price is doing right now
+ *   2. the RECORD clock  - what we sampled, stored, and will be graded on
+ *
+ * The record clock must stay slow. It samples at the frequency decisions are
+ * made, and nothing about a 1-day call improves by storing more points.
+ *
+ * The display clock had no excuse for being slow. It was a number rendered at
+ * build time next to an age counter frozen at build time - which meant the age
+ * was actively WRONG within a minute, on the page whose whole job is to tell
+ * you when data is stale. That was a real defect and this fixes it.
+ *
+ * Coinbase publishes a free public WebSocket. No key, no account, no server -
+ * the browser connects directly. Prices tick live; ages recompute every second
+ * from real timestamps instead of being baked in.
+ *
+ * MARA's condition, and it is not negotiable: the live price is DISPLAY ONLY.
+ * It is never recorded, never scored, never fed to a call. Anything marked LIVE
+ * is decoration. The number in the log is the one the snapshot captured.
+ */
+(function () {
+  var fmt = function (m) {
+    if (m < 1) return "just now";
+    if (m < 90) return Math.round(m) + "m ago";
+    if (m < 2880) return (m / 60).toFixed(1) + "h ago";
+    return (m / 1440).toFixed(1) + "d ago";
+  };
+
+  function tickAges() {
+    var now = Date.now();
+    document.querySelectorAll("[data-ts]").forEach(function (el) {
+      var t = Date.parse(el.getAttribute("data-ts"));
+      if (isNaN(t)) return;
+      var mins = (now - t) / 60000;
+      el.textContent = fmt(mins);
+      var budget = parseFloat(el.getAttribute("data-budget") || "120");
+      el.style.color = mins > budget ? "#f7d488" : "";
+    });
+    var c = document.getElementById("nowclock");
+    if (c) c.textContent = new Date().toLocaleTimeString();
+  }
+  tickAges();
+  setInterval(tickAges, 1000);
+
+  var syms = Array.prototype.map.call(
+    document.querySelectorAll("[data-live]"),
+    function (el) { return el.getAttribute("data-live"); });
+  if (!syms.length || !("WebSocket" in window)) return;
+
+  var ws, backoff = 1000, closedByUs = false;
+
+  function paint(sym, price) {
+    var el = document.querySelector('[data-live="' + sym + '"]');
+    if (!el) return;
+    var prev = parseFloat(el.getAttribute("data-last") || "0");
+    el.setAttribute("data-last", price);
+    el.textContent = price.toLocaleString(undefined,
+      { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    if (prev) {
+      el.style.transition = "none";
+      el.style.color = price > prev ? "#3987e5" : (price < prev ? "#e66767" : "");
+      setTimeout(function () {
+        el.style.transition = "color .8s"; el.style.color = "";
+      }, 60);
+    }
+    var badge = document.querySelector('[data-livebadge="' + sym + '"]');
+    if (badge) { badge.style.display = "inline-flex"; }
+    var snap = parseFloat(el.getAttribute("data-snapshot") || "0");
+    var drift = document.querySelector('[data-drift="' + sym + '"]');
+    if (drift && snap) {
+      var d = (price - snap) / snap * 100;
+      drift.textContent = (d >= 0 ? "+" : "") + d.toFixed(2) + "% vs snapshot";
+    }
+  }
+
+  function connect() {
+    try { ws = new WebSocket("wss://ws-feed.exchange.coinbase.com"); }
+    catch (e) { return; }
+    ws.onopen = function () {
+      backoff = 1000;
+      ws.send(JSON.stringify({
+        type: "subscribe", product_ids: syms,
+        channels: [{ name: "ticker", product_ids: syms }]
+      }));
+    };
+    ws.onmessage = function (ev) {
+      try {
+        var m = JSON.parse(ev.data);
+        if (m.type === "ticker" && m.product_id && m.price) {
+          paint(m.product_id, parseFloat(m.price));
+        }
+      } catch (e) { /* a malformed frame is not worth breaking the page over */ }
+    };
+    ws.onclose = function () {
+      if (closedByUs) return;
+      document.querySelectorAll("[data-livebadge]").forEach(function (b) {
+        b.style.display = "none";
+      });
+      setTimeout(connect, backoff);
+      backoff = Math.min(backoff * 2, 30000);
+    };
+    ws.onerror = function () { try { ws.close(); } catch (e) {} };
+  }
+  connect();
+  window.addEventListener("beforeunload", function () {
+    closedByUs = true; try { ws.close(); } catch (e) {}
+  });
+})();
+</script>
+
 <footer>Personal paper-trading research log. Every call here is
 unexecuted and hypothetical. Option P&amp;L is marked mid-to-mid and therefore
 optimistic: real fills cross the spread and pay commission. Nothing on this page
 is financial advice, and none of it is a reason to trade. Built for one user;
 not published as a service to anyone.<br><br>Generated
-2026-08-19T22:12:34+00:00 · free public data sources, may
+2026-08-19T22:45:16+00:00 · free public data sources, may
 break without notice.</footer>
 </div></body></html>

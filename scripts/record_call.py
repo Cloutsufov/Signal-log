@@ -52,6 +52,8 @@ def main() -> int:
     ap.add_argument("--rationale")
     ap.add_argument("--invalidation", default="")
     ap.add_argument("--horizon", type=int, default=1)
+    ap.add_argument("--force", action="store_true",
+                    help="log a second call while one is still open")
     a = ap.parse_args()
 
     if a.direction:
@@ -94,6 +96,25 @@ def main() -> int:
         rationale += f"  [invalidation: {call['invalidation']}]"
 
     con = db()
+
+    # RIOS: tonight produced four attempts at one call. Nothing stopped a
+    # second identical row from landing, and a duplicated call is worse than a
+    # missing one - it double-counts one opinion and quietly biases the record
+    # that the whole project exists to measure. One open call per symbol.
+    open_call = con.execute(
+        """SELECT id, ts_utc, direction, confidence FROM calls
+           WHERE symbol=? AND scored=0 ORDER BY id DESC LIMIT 1""",
+        (a.symbol,)).fetchone()
+    if open_call and not a.force:
+        print(f"REFUSED: call #{open_call['id']} on {a.symbol} "
+              f"({open_call['direction']} c{open_call['confidence']}, recorded "
+              f"{open_call['ts_utc'][:16]}Z) has not been scored yet.",
+              file=sys.stderr)
+        print("  One open call per symbol. Wait for it to mature, or pass "
+              "--force if you genuinely mean to log a second opinion.",
+              file=sys.stderr)
+        return 2
+
     s = con.execute("SELECT * FROM snapshots WHERE symbol=? ORDER BY id DESC LIMIT 1",
                     (a.symbol,)).fetchone()
     if not s:

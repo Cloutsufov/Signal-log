@@ -31,14 +31,55 @@ from datetime import datetime, timedelta, timezone
 from common import db, iso, log_run, utcnow
 import providers as P
 
-FLAT_BAND_PCT = 0.25
+# BUG (found in review, before it could corrupt anything): the flat band was
+# 0.25%, written when the primary symbol was SPY. SPY's daily sigma is ~0.8%,
+# so 0.25% is about 0.31 sigma - a sensible "nothing happened" width.
+#
+# BTC's daily sigma is 2-3%. Applying a 0.25% band to it means "flat" is
+# essentially never correct: a normal quiet BTC day blows through it. Every
+# flat call would have been marked a miss, the model would look bad at exactly
+# the calls where it was being honest, and it would learn to stop saying flat.
+#
+# So the band is expressed in SIGMA, not in percent, and derived from the
+# symbol's own realized volatility. The constant below is fixed now, before any
+# call has been scored, and is not to be moved afterwards - moving a threshold
+# once results exist is how a record gets quietly flattered.
+FLAT_BAND_SIGMA = 0.31          # origin: 0.25% / 0.80% daily sigma on SPY
+FALLBACK_BAND = {"equity": 0.25, "crypto": 0.60}   # used when history is thin
 
 
-def mature(call_ts: str, horizon_days: int) -> bool:
+def flat_band_pct(con, symbol: str, asset_class: str) -> tuple[float, str]:
+    """Return (band_pct, how_it_was_derived). Always reported in the outcome
+    note so any row can be audited later."""
+    try:
+        import analytics as A
+        rows = con.execute(
+            """SELECT ts_utc, spot FROM snapshots WHERE symbol=?
+               ORDER BY id DESC LIMIT 200""", (symbol,)).fetchall()
+        closes = A.daily_closes(list(reversed(rows)))
+        rv = A.realized_vol(closes)
+        if rv:
+            daily_sigma = rv / (252 ** 0.5) * 100
+            band = round(FLAT_BAND_SIGMA * daily_sigma, 3)
+            if band > 0:
+                return band, (f"{FLAT_BAND_SIGMA} sigma of {daily_sigma:.2f}% "
+                              f"daily vol over {len(closes)}d")
+    except Exception:  # noqa: BLE001
+        pass
+    fb = FALLBACK_BAND.get(asset_class, 0.25)
+    return fb, f"fallback band for {asset_class} (not enough history)"
+
+
+def mature(call_ts: str, horizon_days: int, asset_class: str = "equity") -> bool:
+    """BUG: this skipped weekends unconditionally, which is right for equities
+    and wrong for crypto. With BTC as the primary symbol, a Friday call would
+    not have been graded until Tuesday - three days of price movement judged as
+    one. Crypto trades every day, so its horizon counts calendar days."""
     t = datetime.fromisoformat(call_ts)
     if t.tzinfo is None:
         t = t.replace(tzinfo=timezone.utc)
-    # horizon in trading days; skip weekends when counting forward
+    if asset_class == "crypto":
+        return utcnow() >= t + timedelta(days=horizon_days)
     d, added = t, 0
     while added < horizon_days:
         d += timedelta(days=1)
@@ -61,9 +102,10 @@ def score_one(con, call) -> str:
 
     spot_now = q["spot"]
     chg = (spot_now - spot_then) / spot_then * 100
+    band, band_why = flat_band_pct(con, sym, asset_class)
 
     if call["direction"] == "flat":
-        correct = 1 if abs(chg) < FLAT_BAND_PCT else 0
+        correct = 1 if abs(chg) < band else 0
     elif call["direction"] == "up":
         correct = 1 if chg > 0 else 0
     else:
@@ -85,6 +127,7 @@ def score_one(con, call) -> str:
             note = f"chain refetch failed: {type(e).__name__}: {e}"
     else:
         note = "no ref contract"
+    note = (note + " | " if note else "") + f"flat band {band:.3f}% ({band_why})"
 
     con.execute(
         """INSERT OR REPLACE INTO outcomes
@@ -130,8 +173,13 @@ def main() -> int:
 
     con = db()
     q = "SELECT * FROM calls" if a.all else "SELECT * FROM calls WHERE scored=0"
+    def cls_of(call) -> str:
+        r = con.execute("SELECT asset_class FROM snapshots WHERE id=?",
+                        (call["snapshot_id"],)).fetchone()
+        return r["asset_class"] if r else "equity"
+
     pending = [c for c in con.execute(q + " ORDER BY id").fetchall()
-               if a.all or mature(c["ts_utc"], c["horizon_days"])]
+               if a.all or mature(c["ts_utc"], c["horizon_days"], cls_of(c))]
 
     if not pending:
         print("no matured calls to score")

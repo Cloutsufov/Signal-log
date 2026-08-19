@@ -65,6 +65,12 @@ nav a:hover{text-decoration:none;color:var(--ink)}
  padding:3px 8px;border-radius:999px;border:1px solid var(--ring);color:var(--ink2);
  letter-spacing:.03em;white-space:nowrap}
 .dot{width:8px;height:8px;border-radius:50%;flex:none}
+.live{display:none;align-items:center;gap:5px;font-size:10px;font-weight:700;
+ letter-spacing:.08em;color:#7ee27e;background:rgba(12,163,12,.14);
+ border:1px solid rgba(12,163,12,.4);border-radius:999px;padding:2px 7px}
+.live i{width:6px;height:6px;border-radius:50%;background:#0ca30c;
+ animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
 .banner{border-radius:14px;padding:11px 13px;margin-bottom:12px;font-size:13px;
  font-weight:600;display:flex;gap:9px;align-items:flex-start;border:1px solid var(--ring)}
 .banner.ok{background:rgba(12,163,12,.12);color:#7ee27e}
@@ -117,6 +123,121 @@ details[open] summary::after{content:" ▴"}
 details ol{margin:10px 0 2px;padding-left:0;list-style:none}
 details ol li{padding:7px 0;border-top:1px solid var(--grid);font-size:12.5px;
  color:var(--ink2);line-height:1.55}
+"""
+
+LIVE_JS = """
+<script>
+/* DEV: the honest answer to "it feels slow".
+ *
+ * There are two different clocks in this system and v1 confused them:
+ *   1. the DISPLAY clock - what the price is doing right now
+ *   2. the RECORD clock  - what we sampled, stored, and will be graded on
+ *
+ * The record clock must stay slow. It samples at the frequency decisions are
+ * made, and nothing about a 1-day call improves by storing more points.
+ *
+ * The display clock had no excuse for being slow. It was a number rendered at
+ * build time next to an age counter frozen at build time - which meant the age
+ * was actively WRONG within a minute, on the page whose whole job is to tell
+ * you when data is stale. That was a real defect and this fixes it.
+ *
+ * Coinbase publishes a free public WebSocket. No key, no account, no server -
+ * the browser connects directly. Prices tick live; ages recompute every second
+ * from real timestamps instead of being baked in.
+ *
+ * MARA's condition, and it is not negotiable: the live price is DISPLAY ONLY.
+ * It is never recorded, never scored, never fed to a call. Anything marked LIVE
+ * is decoration. The number in the log is the one the snapshot captured.
+ */
+(function () {
+  var fmt = function (m) {
+    if (m < 1) return "just now";
+    if (m < 90) return Math.round(m) + "m ago";
+    if (m < 2880) return (m / 60).toFixed(1) + "h ago";
+    return (m / 1440).toFixed(1) + "d ago";
+  };
+
+  function tickAges() {
+    var now = Date.now();
+    document.querySelectorAll("[data-ts]").forEach(function (el) {
+      var t = Date.parse(el.getAttribute("data-ts"));
+      if (isNaN(t)) return;
+      var mins = (now - t) / 60000;
+      el.textContent = fmt(mins);
+      var budget = parseFloat(el.getAttribute("data-budget") || "120");
+      el.style.color = mins > budget ? "#f7d488" : "";
+    });
+    var c = document.getElementById("nowclock");
+    if (c) c.textContent = new Date().toLocaleTimeString();
+  }
+  tickAges();
+  setInterval(tickAges, 1000);
+
+  var syms = Array.prototype.map.call(
+    document.querySelectorAll("[data-live]"),
+    function (el) { return el.getAttribute("data-live"); });
+  if (!syms.length || !("WebSocket" in window)) return;
+
+  var ws, backoff = 1000, closedByUs = false;
+
+  function paint(sym, price) {
+    var el = document.querySelector('[data-live="' + sym + '"]');
+    if (!el) return;
+    var prev = parseFloat(el.getAttribute("data-last") || "0");
+    el.setAttribute("data-last", price);
+    el.textContent = price.toLocaleString(undefined,
+      { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    if (prev) {
+      el.style.transition = "none";
+      el.style.color = price > prev ? "#3987e5" : (price < prev ? "#e66767" : "");
+      setTimeout(function () {
+        el.style.transition = "color .8s"; el.style.color = "";
+      }, 60);
+    }
+    var badge = document.querySelector('[data-livebadge="' + sym + '"]');
+    if (badge) { badge.style.display = "inline-flex"; }
+    var snap = parseFloat(el.getAttribute("data-snapshot") || "0");
+    var drift = document.querySelector('[data-drift="' + sym + '"]');
+    if (drift && snap) {
+      var d = (price - snap) / snap * 100;
+      drift.textContent = (d >= 0 ? "+" : "") + d.toFixed(2) + "% vs snapshot";
+    }
+  }
+
+  function connect() {
+    try { ws = new WebSocket("wss://ws-feed.exchange.coinbase.com"); }
+    catch (e) { return; }
+    ws.onopen = function () {
+      backoff = 1000;
+      ws.send(JSON.stringify({
+        type: "subscribe", product_ids: syms,
+        channels: [{ name: "ticker", product_ids: syms }]
+      }));
+    };
+    ws.onmessage = function (ev) {
+      try {
+        var m = JSON.parse(ev.data);
+        if (m.type === "ticker" && m.product_id && m.price) {
+          paint(m.product_id, parseFloat(m.price));
+        }
+      } catch (e) { /* a malformed frame is not worth breaking the page over */ }
+    };
+    ws.onclose = function () {
+      if (closedByUs) return;
+      document.querySelectorAll("[data-livebadge]").forEach(function (b) {
+        b.style.display = "none";
+      });
+      setTimeout(connect, backoff);
+      backoff = Math.min(backoff * 2, 30000);
+    };
+    ws.onerror = function () { try { ws.close(); } catch (e) {} };
+  }
+  connect();
+  window.addEventListener("beforeunload", function () {
+    closedByUs = true; try { ws.close(); } catch (e) {}
+  });
+})();
+</script>
 """
 
 LEAN_COLOR = {"data": "#3987e5", "left": "#9085e9", "center": "#898781",
@@ -347,6 +468,7 @@ def freshness_banner(con, cfg: dict) -> str:
 
 
 def shell(page: str, title: str, body: str) -> str:
+    live_js = LIVE_JS
     nav = "".join(
         '<a href="{}"{}>{}</a>'.format(f, ' class="on"' if f == page else "", n)
         for f, n in PAGES)
@@ -356,9 +478,11 @@ def shell(page: str, title: str, body: str) -> str:
 <meta name="color-scheme" content="dark"><title>{e(title)}</title>
 <style>{CSS}</style></head><body><div class="wrap">
 <div class="row"><h1>SIGNAL LOG</h1>
-<span class="muted">{e(to_et().strftime('%a %b %d, %H:%M ET'))}</span></div>
+<span class="muted">built {e(to_et().strftime('%H:%M ET'))} · now
+<span id="nowclock">--:--:--</span></span></div>
 <nav>{nav}</nav>
 {body}
+{live_js}
 <footer>{DISCLAIMER}<br><br>Generated
 {e(utcnow().isoformat(timespec='seconds'))} · free public data sources, may
 break without notice.</footer>
@@ -682,21 +806,29 @@ def page_index(con, cfg: dict) -> str:
         except json.JSONDecodeError:
             psl = None
 
-    body.append(h2(2, f"Already priced in — {primary}"))
-    body.append(expected_move_card(psl, psnap["spot"], primary) if psl else
-                '<div class="card muted">No option chain stored yet.</div>')
-
-    body.append(h2(3, "What this trade costs before it can win"))
+    # DEV: three sections that can only say "not available" is not information,
+    # it is three empty boxes teaching you to scroll past this part of the page.
+    # When there is no chain, the whole option-context block collapses into one
+    # honest line that says what is missing and what would restore it.
     pcall = next((c for c in calls if c["symbol"] == primary), None)
-    if pcall and psl:
-        body.append(cost_card(pcall, psl, psnap["spot"]))
+    if psl:
+        body.append(h2(2, f"Already priced in — {primary}"))
+        body.append(expected_move_card(psl, psnap["spot"], primary))
+        body.append(h2(3, "What this trade costs before it can win"))
+        body.append(cost_card(pcall, psl, psnap["spot"]) if pcall else
+                    '<div class="card muted">No open call on the primary '
+                    'symbol yet.</div>')
+        body.append(h2(4, "Volatility context"))
+        body.append(vol_card(con, primary, psl))
     else:
-        body.append('<div class="card muted">No open call with a reference '
-                    'contract on the primary symbol yet.</div>')
-
-    body.append(h2(4, "Volatility context"))
-    body.append(vol_card(con, primary, psl) if psl else
-                '<div class="card muted">Needs a stored option chain.</div>')
+        body.append(h2(2, "Option context — unavailable"))
+        body.append('<div class="card muted">Expected move, breakeven and '
+                    'volatility context all need an option chain, and no free '
+                    'chain source will serve this server\'s IP. These three '
+                    'sections reappear automatically the moment chain data '
+                    'exists — nothing here is switched off, it is starved. '
+                    'Until then the call above is a bare directional guess and '
+                    'the record grades it as one.</div>')
 
     ag = agreement_card(con, cfg)
     if ag:
@@ -771,15 +903,24 @@ def page_index(con, cfg: dict) -> str:
                 ("↓", "var(--down)") if (ch or 0) < 0 else ("→", "var(--flat)"))
         a = age_minutes(s["ts_utc"])
         stale = a > cfg["freshness_budget_minutes"].get(cls, 120)
+        budget = cfg["freshness_budget_minutes"].get(cls, 120)
+        live_attr = f'data-live="{e(sym)}"' if cls == "crypto" else ""
+        badge = (f'<span class="live" data-livebadge="{e(sym)}"><i></i>LIVE</span>'
+                 if cls == "crypto" else "")
+        drift = (f'<span class="muted" data-drift="{e(sym)}"></span>'
+                 if cls == "crypto" else "")
         body.append(f"""
         <div class="card">
-          <div class="row"><strong>{e(sym)}</strong>
-            <span class="muted" style="{'color:#f7d488' if stale else ''}">
-              {'⚠ ' if stale else ''}{e(s['provider'])} · {human_age(a)}</span></div>
+          <div class="row"><strong>{e(sym)} {badge}</strong>
+            <span class="muted">{e(s['provider'])} · snapshot
+              <span data-ts="{e(s['ts_utc'])}" data-budget="{budget}">{human_age(a)}</span>
+            </span></div>
           <div class="row" style="margin-top:4px">
-            <span style="font-size:24px;font-weight:600">{s['spot']:,.2f}</span>
+            <span style="font-size:24px;font-weight:600" {live_attr}
+                  data-snapshot="{s['spot']}">{s['spot']:,.2f}</span>
             <span style="color:{c};font-weight:600">{g}
               {f"{ch:+.2f}%" if ch is not None else "n/a"}</span></div>
+          <div class="row" style="margin-top:2px">{drift}</div>
           {sparkline(history(con, sym))}
         </div>""")
 

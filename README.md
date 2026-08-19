@@ -88,9 +88,14 @@ new dependencies, no extra cost.
 
 | Rail | Schedule | What it does |
 |---|---|---|
-| **Equities** | weekdays, 8:30am + 4:30pm ET | SPY, QQQ, IWM spot + ATM option chains |
-| **Crypto** | every 30 min, 24/7 | BTC-USD, ETH-USD spot |
-| **News** | every 30 min | ~20 RSS feeds, primary sources tiered above press |
+| **Crypto** | every 30 min, 24/7 | BTC-USD, ETH-USD spot + 14d daily closes |
+| **News** | every 30 min | 25 RSS feeds, primary sources tiered above press |
+| **Equities** | weekdays, 8:30am + 4:30pm ET | **parked** — every free keyless source 429s from a cloud IP |
+
+The **display layer** is separate and real-time: crypto prices tick live over
+Coinbase's free public WebSocket straight from the browser, and freshness ages
+recompute every second. That layer is display-only — it is never recorded,
+never scored, never fed into a call.
 
 The news rail is **read-only**. Headlines are shown to you and are never fed to
 the model. That is a security control, not an oversight — see `fetch_news.py`.
@@ -163,9 +168,11 @@ No `pip install` anywhere. Python 3.9+ standard library only.
 Two numbers, always shown together:
 
 1. **Direction correct** — did spot move the way the call said. This is the
-   vanity metric. A `flat` call counts as correct if the move was under 0.25%;
-   that threshold is written down in `score.py` so it can't be quietly moved
-   later to flatter the record.
+   vanity metric. A `flat` call counts as correct if the move stayed inside a
+   band of **0.31 sigma of that symbol's own realized daily volatility** —
+   about 0.25% on SPY, closer to 1% on BTC. The constant is fixed in `score.py`
+   and every scored row records how its band was derived, so the record can be
+   audited and the threshold can't be quietly widened later to flatter it.
 2. **Option P&L %** — what the specific ATM contract named *at call time*
    actually did. The contract symbol, its mid, and its bid/ask spread are locked
    in when the call is recorded, so you can't retroactively pick a strike that

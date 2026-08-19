@@ -36,6 +36,12 @@ nav a:hover{text-decoration:none;color:var(--ink)}
  padding:3px 8px;border-radius:999px;border:1px solid var(--ring);color:var(--ink2);
  letter-spacing:.03em;white-space:nowrap}
 .dot{width:8px;height:8px;border-radius:50%;flex:none}
+.live{display:none;align-items:center;gap:5px;font-size:10px;font-weight:700;
+ letter-spacing:.08em;color:#7ee27e;background:rgba(12,163,12,.14);
+ border:1px solid rgba(12,163,12,.4);border-radius:999px;padding:2px 7px}
+.live i{width:6px;height:6px;border-radius:50%;background:#0ca30c;
+ animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
 .banner{border-radius:14px;padding:11px 13px;margin-bottom:12px;font-size:13px;
  font-weight:600;display:flex;gap:9px;align-items:flex-start;border:1px solid var(--ring)}
 .banner.ok{background:rgba(12,163,12,.12);color:#7ee27e}
@@ -90,7 +96,8 @@ details ol li{padding:7px 0;border-top:1px solid var(--grid);font-size:12.5px;
  color:var(--ink2);line-height:1.55}
 </style></head><body><div class="wrap">
 <div class="row"><h1>SIGNAL LOG</h1>
-<span class="muted">Wed Aug 19, 18:12 ET</span></div>
+<span class="muted">built 18:45 ET · now
+<span id="nowclock">--:--:--</span></span></div>
 <nav><a href="index.html">Signals</a><a href="record.html" class="on">Record</a><a href="news.html">News</a></nav>
 <div class="banner ok"><span>✓</span><span>All rails fresh — oldest tracked symbol is ETH-USD at 0 min.</span></div>
 <div class="banner warn"><span>⚠</span><span>Direction-only scoring — no option chain source is connected, so hit rates below are an upper bound.<br><span style="font-weight:400">Being right on direction and still losing to theta and the spread is the normal case; without chain data this page cannot see that. This notice clears itself the moment chain data arrives.</span></span></div>
@@ -102,11 +109,125 @@ details ol li{padding:7px 0;border-top:1px solid var(--grid);font-size:12.5px;
 <h2>Every scored call</h2>
 <div class="card muted">Nothing scored yet. This table is the only reason to trust — or stop trusting — anything on the signals page.</div>
 <div class="muted" style="margin-top:10px">1 call(s) recorded and not yet matured. 0 scored. 0 scored on spot only (no option price available at scoring time).</div>
+
+<script>
+/* DEV: the honest answer to "it feels slow".
+ *
+ * There are two different clocks in this system and v1 confused them:
+ *   1. the DISPLAY clock - what the price is doing right now
+ *   2. the RECORD clock  - what we sampled, stored, and will be graded on
+ *
+ * The record clock must stay slow. It samples at the frequency decisions are
+ * made, and nothing about a 1-day call improves by storing more points.
+ *
+ * The display clock had no excuse for being slow. It was a number rendered at
+ * build time next to an age counter frozen at build time - which meant the age
+ * was actively WRONG within a minute, on the page whose whole job is to tell
+ * you when data is stale. That was a real defect and this fixes it.
+ *
+ * Coinbase publishes a free public WebSocket. No key, no account, no server -
+ * the browser connects directly. Prices tick live; ages recompute every second
+ * from real timestamps instead of being baked in.
+ *
+ * MARA's condition, and it is not negotiable: the live price is DISPLAY ONLY.
+ * It is never recorded, never scored, never fed to a call. Anything marked LIVE
+ * is decoration. The number in the log is the one the snapshot captured.
+ */
+(function () {
+  var fmt = function (m) {
+    if (m < 1) return "just now";
+    if (m < 90) return Math.round(m) + "m ago";
+    if (m < 2880) return (m / 60).toFixed(1) + "h ago";
+    return (m / 1440).toFixed(1) + "d ago";
+  };
+
+  function tickAges() {
+    var now = Date.now();
+    document.querySelectorAll("[data-ts]").forEach(function (el) {
+      var t = Date.parse(el.getAttribute("data-ts"));
+      if (isNaN(t)) return;
+      var mins = (now - t) / 60000;
+      el.textContent = fmt(mins);
+      var budget = parseFloat(el.getAttribute("data-budget") || "120");
+      el.style.color = mins > budget ? "#f7d488" : "";
+    });
+    var c = document.getElementById("nowclock");
+    if (c) c.textContent = new Date().toLocaleTimeString();
+  }
+  tickAges();
+  setInterval(tickAges, 1000);
+
+  var syms = Array.prototype.map.call(
+    document.querySelectorAll("[data-live]"),
+    function (el) { return el.getAttribute("data-live"); });
+  if (!syms.length || !("WebSocket" in window)) return;
+
+  var ws, backoff = 1000, closedByUs = false;
+
+  function paint(sym, price) {
+    var el = document.querySelector('[data-live="' + sym + '"]');
+    if (!el) return;
+    var prev = parseFloat(el.getAttribute("data-last") || "0");
+    el.setAttribute("data-last", price);
+    el.textContent = price.toLocaleString(undefined,
+      { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    if (prev) {
+      el.style.transition = "none";
+      el.style.color = price > prev ? "#3987e5" : (price < prev ? "#e66767" : "");
+      setTimeout(function () {
+        el.style.transition = "color .8s"; el.style.color = "";
+      }, 60);
+    }
+    var badge = document.querySelector('[data-livebadge="' + sym + '"]');
+    if (badge) { badge.style.display = "inline-flex"; }
+    var snap = parseFloat(el.getAttribute("data-snapshot") || "0");
+    var drift = document.querySelector('[data-drift="' + sym + '"]');
+    if (drift && snap) {
+      var d = (price - snap) / snap * 100;
+      drift.textContent = (d >= 0 ? "+" : "") + d.toFixed(2) + "% vs snapshot";
+    }
+  }
+
+  function connect() {
+    try { ws = new WebSocket("wss://ws-feed.exchange.coinbase.com"); }
+    catch (e) { return; }
+    ws.onopen = function () {
+      backoff = 1000;
+      ws.send(JSON.stringify({
+        type: "subscribe", product_ids: syms,
+        channels: [{ name: "ticker", product_ids: syms }]
+      }));
+    };
+    ws.onmessage = function (ev) {
+      try {
+        var m = JSON.parse(ev.data);
+        if (m.type === "ticker" && m.product_id && m.price) {
+          paint(m.product_id, parseFloat(m.price));
+        }
+      } catch (e) { /* a malformed frame is not worth breaking the page over */ }
+    };
+    ws.onclose = function () {
+      if (closedByUs) return;
+      document.querySelectorAll("[data-livebadge]").forEach(function (b) {
+        b.style.display = "none";
+      });
+      setTimeout(connect, backoff);
+      backoff = Math.min(backoff * 2, 30000);
+    };
+    ws.onerror = function () { try { ws.close(); } catch (e) {} };
+  }
+  connect();
+  window.addEventListener("beforeunload", function () {
+    closedByUs = true; try { ws.close(); } catch (e) {}
+  });
+})();
+</script>
+
 <footer>Personal paper-trading research log. Every call here is
 unexecuted and hypothetical. Option P&amp;L is marked mid-to-mid and therefore
 optimistic: real fills cross the spread and pay commission. Nothing on this page
 is financial advice, and none of it is a reason to trade. Built for one user;
 not published as a service to anyone.<br><br>Generated
-2026-08-19T22:12:34+00:00 · free public data sources, may
+2026-08-19T22:45:16+00:00 · free public data sources, may
 break without notice.</footer>
 </div></body></html>
