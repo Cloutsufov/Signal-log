@@ -96,19 +96,19 @@ details ol li{padding:7px 0;border-top:1px solid var(--grid);font-size:12.5px;
  color:var(--ink2);line-height:1.55}
 </style></head><body><div class="wrap">
 <div class="row"><h1>SIGNAL LOG</h1>
-<span class="muted">built 22:09 ET · now
+<span class="muted">built 23:15 ET · now
 <span id="nowclock">--:--:--</span></span></div>
 <nav><a href="index.html">Signals</a><a href="record.html" class="on">Record</a><a href="news.html">News</a></nav>
 <div class="banner ok"><span>✓</span><span>All rails fresh — oldest tracked symbol is ETH-USD at 0 min.</span></div>
 <div class="banner warn"><span>⚠</span><span>Direction-only scoring — no option chain source is connected, so hit rates below are an upper bound.<br><span style="font-weight:400">Being right on direction and still losing to theta and the spread is the normal case; without chain data this page cannot see that. This notice clears itself the moment chain data arrives.</span></span></div>
-<div class="banner warn"><span>⚠</span><span>Not enough data to judge confidence</span></div><div class="card muted">0 scored calls. Confidence claims are unfalsifiable below ~20 and unreliable below ~50. Until then, treat every call as confidence 1 regardless of what it says.</div>
+<div class="banner warn"><span>⚠</span><span>Not enough data to judge confidence</span></div><div class="card muted">1 scored calls. Confidence claims are unfalsifiable below ~20 and unreliable below ~50. Until then, treat every call as confidence 1 regardless of what it says.</div>
 <h2>Does confidence mean anything?</h2>
-<div class="card muted">Nothing scored yet. This is the first thing to look at once calls start maturing.</div>
+<div class="card"><div class="bars"><div class="bar"><span class="muted">conf 3</span><span class="track"><i class="fill" style="width:0%;background:#d03b3b"></i></span><span class="muted">0% · n=1 · —</span></div></div><div class="muted" style="margin-top:12px">Bars are direction hit rate at each claimed confidence level; the right column adds sample size and average option P&amp;L. For confidence to be worth anything, these should climb left to right.</div></div>
 <h2>Directional bias</h2>
-<div class="card muted">No scored calls yet.</div>
+<div class="card" style="padding:6px 14px 2px"><table><thead><tr><th>call</th><th>n</th><th>hit rate</th><th>avg option</th></tr></thead><tbody><tr><td>→ flat</td><td>1</td><td>0%</td><td>—</td></tr></tbody></table></div><div class="muted">If almost every call is "up", the model has a bullish bias rather than a view, and a rising market will flatter it until it doesn't.</div>
 <h2>Every scored call</h2>
-<div class="card muted">Nothing scored yet. This table is the only reason to trust — or stop trusting — anything on the signals page.</div>
-<div class="muted" style="margin-top:10px">1 call(s) recorded and not yet matured. 0 scored. 0 scored on spot only (no option price available at scoring time).</div>
+<div class="card" style="padding:6px 14px 2px"><table><thead><tr><th>date</th><th>sym</th><th>call</th><th>spot</th><th>result</th><th>option</th></tr></thead><tbody><tr><td>2026-08-19</td><td>BTC-USD</td><td>→ flat <span class="muted">c3</span></td><td>+7.16%</td><td style="color:var(--crit)">✗ miss</td><td>—</td></tr></tbody></table></div>
+<div class="muted" style="margin-top:10px">0 call(s) recorded and not yet matured. 1 scored. 1 scored on spot only (no option price available at scoring time).</div>
 
 <script>
 /* DEV: the honest answer to "it feels slow".
@@ -228,6 +228,6 @@ unexecuted and hypothetical. Option P&amp;L is marked mid-to-mid and therefore
 optimistic: real fills cross the spread and pay commission. Nothing on this page
 is financial advice, and none of it is a reason to trade. Built for one user;
 not published as a service to anyone.<br><br>Generated
-2026-08-20T02:09:43+00:00 · free public data sources, may
+2026-08-20T03:15:00+00:00 · free public data sources, may
 break without notice.</footer>
 </div></body></html>
