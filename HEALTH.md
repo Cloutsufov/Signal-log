@@ -1,10 +1,10 @@
 # Last run
 
-`2026-09-12 19:50 UTC` · trigger: `*/30 * * * *`
+`2026-09-12 21:45 UTC` · trigger: `*/30 * * * *`
 
 ```
 trigger: action=(none) schedule=*/30 * * * *
-ET now:  2026-09-12 15:50 (weekend)
+ET now:  2026-09-12 17:45 (weekend)
 plan:    4 step(s)
   - fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
   - fetch_news.py
@@ -12,8 +12,8 @@ plan:    4 step(s)
   - build_site.py
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
-  ok  BTC-USD: 77096.455 via coinbase (-0.22%)
-  ok  ETH-USD: 2517.105 via coinbase (-0.86%)
+  ok  BTC-USD: 77223.375 via coinbase (+0.15%)
+  ok  ETH-USD: 2523.32 via coinbase (+0.29%)
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/fetch_news.py
   ok    Federal Reserve          20 items, 0 new
@@ -25,10 +25,10 @@ $ /home/runner/work/Signal-log/Signal-log/scripts/fetch_news.py
   ok    CNBC Top News            21 items, 0 new
   ok    CNBC Markets             30 items, 0 new
   ok    MarketWatch              10 items, 0 new
-  ok    Yahoo Finance            50 items, 9 new
+  ok    Yahoo Finance            50 items, 6 new
   ok    Fox Business             25 items, 0 new
-  ok    BBC Business             56 items, 1 new
-  ok    Al Jazeera               3 items, 0 new
+  ok    BBC Business             56 items, 0 new
+  ok    Al Jazeera               1 items, 1 new
   ok    DW Business              20 items, 0 new
   ok    CoinDesk                 25 items, 2 new
   ok    Cointelegraph            30 items, 0 new
@@ -38,7 +38,7 @@ $ /home/runner/work/Signal-log/Signal-log/scripts/fetch_news.py
   ok    Reuters Business (Google) 0 items, 0 new
   ok    AP Business (Google)     0 items, 0 new
 
-21 feeds alive, 0 dead, 12 new headlines, 31 filtered as off-topic, 0 purged from history
+21 feeds alive, 0 dead, 9 new headlines, 33 filtered as off-topic, 0 purged from history
 dead: none
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/score.py
@@ -49,9 +49,9 @@ no matured calls to score
   reminder: option P&L is marked mid-to-mid. Reality is worse.
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/build_site.py
-wrote docs/index.html (20,014 bytes)
+wrote docs/index.html (20,009 bytes)
 wrote docs/record.html (13,410 bytes)
-wrote docs/news.html (42,206 bytes)
+wrote docs/news.html (42,008 bytes)
 
 done
 ```
