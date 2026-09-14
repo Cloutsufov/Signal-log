@@ -1,9 +1,57 @@
 # Last run
 
-`2026-09-14 18:07 UTC` · trigger: `30 12 * * 1-5`
+`2026-09-14 18:47 UTC` · trigger: `*/30 * * * *`
 
 ```
-trigger: action=(none) schedule=30 12 * * 1-5
-ET now:  2026-09-14 14:07 (open)
-nothing to do for this trigger - exiting clean
+trigger: action=(none) schedule=*/30 * * * *
+ET now:  2026-09-14 14:46 (open)
+plan:    4 step(s)
+  - fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
+  - fetch_news.py
+  - score.py
+  - build_site.py
+
+$ /home/runner/work/Signal-log/Signal-log/scripts/fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
+  ok  BTC-USD: 79242.395 via coinbase (+2.50%)
+  ok  ETH-USD: 2541.615 via coinbase (+1.32%)
+
+$ /home/runner/work/Signal-log/Signal-log/scripts/fetch_news.py
+  ok    Federal Reserve          20 items, 0 new
+  ok    Fed - Monetary Policy    15 items, 0 new
+  ok    SEC Press                25 items, 1 new
+  ok    BEA News                 48 items, 0 new
+  ok    NPR Business             10 items, 0 new
+  ok    Guardian Business        39 items, 6 new
+  ok    CNBC Top News            24 items, 8 new
+  ok    CNBC Markets             30 items, 0 new
+  ok    MarketWatch              10 items, 9 new
+  ok    Yahoo Finance            49 items, 22 new
+  ok    Fox Business             25 items, 1 new
+  ok    BBC Business             56 items, 1 new
+  ok    Al Jazeera               11 items, 10 new
+  ok    DW Business              20 items, 1 new
+  ok    CoinDesk                 25 items, 8 new
+  ok    Cointelegraph            30 items, 7 new
+  ok    Fed - Speeches           15 items, 0 new
+  ok    Fed - Enforcement        15 items, 0 new
+  ok    EIA Today in Energy      15 items, 0 new
+  DEAD  Reuters Business (Google) FetchError: GET https://news.google.com/rss/search?q=when:24h+allinurl:reuters.com%2Fbusiness&hl=en-US&gl=US&ceid=US:en failed: HTTP 503 Service Unavailable :: <html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"/><title>Sorry...</title><style> body { font-family: verdana, arial, sans-serif; background-color: #fff; color: #000; }</s
+  DEAD  AP Business (Google)     FetchError: GET https://news.google.com/rss/search?q=when:24h+allinurl:apnews.com%2Farticle&hl=en-US&gl=US&ceid=US:en failed: HTTP 503 Service Unavailable :: <html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"/><title>Sorry...</title><style> body { font-family: verdana, arial, sans-serif; background-color: #fff; color: #000; }</s
+
+19 feeds alive, 2 dead, 74 new headlines, 20 filtered as off-topic, 0 purged from history
+dead: Reuters Business (Google)(FetchError), AP Business (Google)(FetchError)
+
+$ /home/runner/work/Signal-log/Signal-log/scripts/score.py
+no matured calls to score
+
+--- record ---
+  BTC-USD    1 calls | direction   0.0% | avg option P&L n/a | profitable 0/1
+  reminder: option P&L is marked mid-to-mid. Reality is worse.
+
+$ /home/runner/work/Signal-log/Signal-log/scripts/build_site.py
+wrote docs/index.html (20,015 bytes)
+wrote docs/record.html (13,410 bytes)
+wrote docs/news.html (43,827 bytes)
+
+done
 ```
