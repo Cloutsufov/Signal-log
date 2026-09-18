@@ -1,10 +1,10 @@
 # Last run
 
-`2026-09-18 01:20 UTC` · trigger: `*/30 * * * *`
+`2026-09-18 06:05 UTC` · trigger: `*/30 * * * *`
 
 ```
 trigger: action=(none) schedule=*/30 * * * *
-ET now:  2026-09-17 21:19 (postclose)
+ET now:  2026-09-18 02:04 (premarket)
 plan:    4 step(s)
   - fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
   - fetch_news.py
@@ -12,8 +12,8 @@ plan:    4 step(s)
   - build_site.py
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
-  ok  BTC-USD: 76502.885 via coinbase (+0.27%)
-  ok  ETH-USD: 2447.39 via coinbase (+0.90%)
+  ok  BTC-USD: 77482.75 via coinbase (+1.41%)
+  ok  ETH-USD: 2484.255 via coinbase (+1.86%)
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/fetch_news.py
   ok    Federal Reserve          20 items, 0 new
@@ -21,24 +21,24 @@ $ /home/runner/work/Signal-log/Signal-log/scripts/fetch_news.py
   ok    SEC Press                25 items, 0 new
   ok    BEA News                 48 items, 0 new
   ok    NPR Business             10 items, 0 new
-  ok    Guardian Business        40 items, 0 new
-  ok    CNBC Top News            20 items, 0 new
+  ok    Guardian Business        40 items, 5 new
+  ok    CNBC Top News            18 items, 4 new
   ok    CNBC Markets             30 items, 0 new
   ok    MarketWatch              10 items, 0 new
-  ok    Yahoo Finance            50 items, 24 new
+  ok    Yahoo Finance            49 items, 22 new
   ok    Fox Business             25 items, 0 new
   ok    BBC Business             53 items, 1 new
-  ok    Al Jazeera               5 items, 1 new
+  ok    Al Jazeera               9 items, 8 new
   ok    DW Business              20 items, 0 new
-  ok    CoinDesk                 25 items, 0 new
-  ok    Cointelegraph            30 items, 1 new
+  ok    CoinDesk                 25 items, 4 new
+  ok    Cointelegraph            30 items, 4 new
   ok    Fed - Speeches           15 items, 0 new
   ok    Fed - Enforcement        15 items, 0 new
   ok    EIA Today in Energy      16 items, 0 new
   ok    Reuters Business (Google) 0 items, 0 new
   ok    AP Business (Google)     0 items, 0 new
 
-21 feeds alive, 0 dead, 27 new headlines, 30 filtered as off-topic, 0 purged from history
+21 feeds alive, 0 dead, 48 new headlines, 28 filtered as off-topic, 0 purged from history
 dead: none
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/score.py
@@ -51,7 +51,7 @@ no matured calls to score
 $ /home/runner/work/Signal-log/Signal-log/scripts/build_site.py
 wrote docs/index.html (20,008 bytes)
 wrote docs/record.html (13,410 bytes)
-wrote docs/news.html (43,045 bytes)
+wrote docs/news.html (43,306 bytes)
 
 done
 ```
