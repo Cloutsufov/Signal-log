@@ -1,57 +1,57 @@
 # Last run
 
-`2026-09-21 14:38 UTC` · trigger: `*/30 * * * *`
+`2026-09-21 18:13 UTC` · trigger: `17 12 * * 1`
 
 ```
-trigger: action=(none) schedule=*/30 * * * *
-ET now:  2026-09-21 10:38 (open)
-plan:    4 step(s)
-  - fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
-  - fetch_news.py
-  - score.py
+trigger: action=(none) schedule=17 12 * * 1
+ET now:  2026-09-21 14:13 (open)
+plan:    2 step(s)
+  - doctor.py --prune
   - build_site.py
 
-$ /home/runner/work/Signal-log/Signal-log/scripts/fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
-  ok  BTC-USD: 85975.595 via coinbase (+6.62%)
-  ok  ETH-USD: 2741.945 via coinbase (+6.08%)
+$ /home/runner/work/Signal-log/Signal-log/scripts/doctor.py --prune
+=== quotes ===
+  OK    coinbase BTC-USD                     352ms  spot 85980.615
+  OK    coinbase ETH-USD                     194ms  spot 2750.085
 
-$ /home/runner/work/Signal-log/Signal-log/scripts/fetch_news.py
-  ok    Federal Reserve          20 items, 0 new
-  ok    Fed - Monetary Policy    15 items, 0 new
-  ok    SEC Press                25 items, 0 new
-  ok    BEA News                 48 items, 0 new
-  ok    NPR Business             10 items, 2 new
-  ok    Guardian Business        40 items, 4 new
-  ok    CNBC Top News            20 items, 10 new
-  ok    CNBC Markets             30 items, 0 new
-  ok    MarketWatch              10 items, 6 new
-  ok    Yahoo Finance            49 items, 25 new
-  ok    Fox Business             25 items, 0 new
-  ok    BBC Business             53 items, 1 new
-  ok    Al Jazeera               10 items, 10 new
-  ok    DW Business              20 items, 1 new
-  ok    CoinDesk                 25 items, 12 new
-  ok    Cointelegraph            30 items, 7 new
-  ok    Fed - Speeches           15 items, 0 new
-  ok    Fed - Enforcement        15 items, 0 new
-  ok    EIA Today in Energy      17 items, 0 new
-  ok    Reuters Business (Google) 0 items, 0 new
-  ok    AP Business (Google)     0 items, 0 new
+=== options ===
 
-21 feeds alive, 0 dead, 78 new headlines, 25 filtered as off-topic, 0 purged from history
-dead: none
+=== news feeds ===
+  OK    Federal Reserve [data]               150ms  20 items | Federal Reserve Board announces termination 
+  OK    Fed - Monetary Policy [data]         117ms  15 items | Federal Reserve issues FOMC statement
+  OK    SEC Press [data]                     213ms  25 items | SEC Issues “Innovation Exemption” to Facilit
+  OK    BEA News [data]                      365ms  48 items | U.S. International Trade in Goods and Servic
+  OK    NPR Business [left]                  373ms  10 items | Paramount makes concessions to salvage $111 
+  OK    Guardian Business [left]             202ms  40 items | Airlines urge action after UK flights delaye
+  OK    CNBC Top News [center]               135ms  30 items | Paramount and state AGs settle lawsuit, allo
+  OK    CNBC Markets [center]                101ms  30 items | France’s wine production nears a 70-year low
+  OK    MarketWatch [center]                  98ms  10 items | ‘She says it’s just money’: My friend pays f
+  OK    Yahoo Finance [center]               184ms  50 items | Jim Cramer sends strong signal to Apple stoc
+  OK    Fox Business [right]                 162ms  25 items | Major airlines cut flights as higher jet fue
+  OK    BBC Business [intl]                  129ms  52 items | Repeated air traffic control failures leave 
+  OK    Al Jazeera [intl]                    180ms  25 items | Ceuta solidarity shirt row: How the crisis e
+  OK    DW Business [intl]                   745ms  20 items | Germany's car crisis: Can the 35-hour workwe
+  OK    CoinDesk [crypto]                    309ms  25 items | Crypto political group plans to spend $30 mi
+  OK    Cointelegraph [crypto]               174ms  30 items | Circle launches Bitcoin-backed USDC borrowin
+  OK    Fed - Speeches [data]                148ms  15 items | Bowman, Initial Findings from Independent Re
+  OK    Fed - Enforcement [data]             161ms  15 items | Federal Reserve Board announces termination 
+  OK    EIA Today in Energy [data]         10222ms  17 items | What goes into diesel prices?
+  OK    Reuters Business (Google) [center]   396ms  0 items | EMPTY
+  OK    AP Business (Google) [center]        402ms  0 items | EMPTY
 
-$ /home/runner/work/Signal-log/Signal-log/scripts/score.py
-no matured calls to score
+=== summary ===
+  quotes:  2/2 provider+symbol combinations alive
+  options: 0/0 chains alive - scoring degrades to spot-only
+  news:    21/21 feeds alive
 
---- record ---
-  BTC-USD    1 calls | direction   0.0% | avg option P&L n/a | profitable 0/1
-  reminder: option P&L is marked mid-to-mid. Reality is worse.
+  NOTE: without a chain, calls still record and score on spot,
+  but option P&L will be blank. That is a degraded mode, not a
+  broken one. Check if Yahoo now requires a cookie+crumb.
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/build_site.py
-wrote docs/index.html (20,009 bytes)
-wrote docs/record.html (13,410 bytes)
-wrote docs/news.html (42,522 bytes)
+wrote docs/index.html (20,071 bytes)
+wrote docs/record.html (13,468 bytes)
+wrote docs/news.html (42,617 bytes)
 
 done
 ```
