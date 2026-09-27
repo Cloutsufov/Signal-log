@@ -1,10 +1,10 @@
 # Last run
 
-`2026-09-27 14:52 UTC` · trigger: `*/30 * * * *`
+`2026-09-27 18:43 UTC` · trigger: `*/30 * * * *`
 
 ```
 trigger: action=(none) schedule=*/30 * * * *
-ET now:  2026-09-27 10:52 (weekend)
+ET now:  2026-09-27 14:43 (weekend)
 plan:    4 step(s)
   - fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
   - fetch_news.py
@@ -12,33 +12,33 @@ plan:    4 step(s)
   - build_site.py
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
-  ok  BTC-USD: 84530.155 via coinbase (+0.61%)
-  ok  ETH-USD: 2688.125 via coinbase (-0.02%)
+  ok  BTC-USD: 84744.145 via coinbase (+0.89%)
+  ok  ETH-USD: 2696.225 via coinbase (+0.43%)
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/fetch_news.py
   ok    Federal Reserve          20 items, 0 new
   ok    Fed - Monetary Policy    15 items, 0 new
   ok    SEC Press                25 items, 0 new
   ok    BEA News                 48 items, 0 new
-  ok    NPR Business             10 items, 1 new
-  ok    Guardian Business        40 items, 5 new
-  ok    CNBC Top News            16 items, 5 new
+  ok    NPR Business             10 items, 0 new
+  ok    Guardian Business        40 items, 4 new
+  ok    CNBC Top News            16 items, 1 new
   ok    CNBC Markets             30 items, 0 new
-  ok    MarketWatch              10 items, 3 new
+  ok    MarketWatch              10 items, 0 new
   ok    Yahoo Finance            49 items, 0 new
   ok    Fox Business             25 items, 0 new
-  ok    BBC Business             52 items, 1 new
-  ok    Al Jazeera               11 items, 6 new
+  ok    BBC Business             52 items, 0 new
+  ok    Al Jazeera               5 items, 1 new
   ok    DW Business              20 items, 0 new
-  ok    CoinDesk                 25 items, 2 new
-  ok    Cointelegraph            30 items, 2 new
+  ok    CoinDesk                 25 items, 0 new
+  ok    Cointelegraph            30 items, 0 new
   ok    Fed - Speeches           15 items, 0 new
   ok    Fed - Enforcement        15 items, 0 new
   ok    EIA Today in Energy      19 items, 0 new
   ok    Reuters Business (Google) 0 items, 0 new
   ok    AP Business (Google)     0 items, 0 new
 
-21 feeds alive, 0 dead, 25 new headlines, 28 filtered as off-topic, 0 purged from history
+21 feeds alive, 0 dead, 6 new headlines, 34 filtered as off-topic, 0 purged from history
 dead: none
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/score.py
@@ -49,9 +49,9 @@ no matured calls to score
   reminder: option P&L is marked mid-to-mid. Reality is worse.
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/build_site.py
-wrote docs/index.html (20,007 bytes)
+wrote docs/index.html (20,004 bytes)
 wrote docs/record.html (13,410 bytes)
-wrote docs/news.html (42,844 bytes)
+wrote docs/news.html (42,885 bytes)
 
 done
 ```
