@@ -1,22 +1,45 @@
 # Last run
 
-`2026-10-05 21:06 UTC` · trigger: `30 12 * * 1-5`
+`2026-10-06 00:26 UTC` · trigger: `*/30 * * * *`
 
 ```
-trigger: action=(none) schedule=30 12 * * 1-5
-ET now:  2026-10-05 17:00 (postclose)
+trigger: action=(none) schedule=*/30 * * * *
+ET now:  2026-10-05 20:25 (postclose)
 plan:    4 step(s)
-  - fetch_market.py --class equity --symbols SPY,QQQ,IWM
+  - fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
+  - fetch_news.py
   - score.py
-  - make_prompt.py --symbol BTC-USD
   - build_site.py
 
-$ /home/runner/work/Signal-log/Signal-log/scripts/fetch_market.py --class equity --symbols SPY,QQQ,IWM
-FATAL: every symbol failed - check scripts/doctor.py output
-  FAIL SPY: quote failed: all providers failed for SPY: tradier: no TRADIER_TOKEN set | finnhub: no FINNHUB_KEY set | twelvedata: no TWELVEDATA_KEY set | yahoo-q1: HTTP 429 | yahoo-q2: HTTP 429 | stooq-daily: GET https://stooq.com/q/d/l/?s=spy.us&i=d failed: URLError: <urlopen error timed out>
-  FAIL QQQ: quote failed: all providers failed for QQQ: tradier: no TRADIER_TOKEN set | finnhub: no FINNHUB_KEY set | twelvedata: no TWELVEDATA_KEY set | yahoo-q1: HTTP 429 | yahoo-q2: HTTP 429 | stooq-daily: GET https://stooq.com/q/d/l/?s=qqq.us&i=d failed: URLError: <urlopen error timed out>
-  FAIL IWM: quote failed: all providers failed for IWM: tradier: no TRADIER_TOKEN set | finnhub: no FINNHUB_KEY set | twelvedata: no TWELVEDATA_KEY set | yahoo-q1: HTTP 429 | yahoo-q2: HTTP 429 | stooq-daily: GET https://stooq.com/q/d/l/?s=iwm.us&i=d failed: URLError: <urlopen error timed out>
-  -> exit 1  (tolerated)
+$ /home/runner/work/Signal-log/Signal-log/scripts/fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
+  ok  BTC-USD: 85907.405 via coinbase (-0.84%)
+  ok  ETH-USD: 2714.595 via coinbase (-0.52%)
+
+$ /home/runner/work/Signal-log/Signal-log/scripts/fetch_news.py
+  ok    Federal Reserve          20 items, 1 new
+  ok    Fed - Monetary Policy    15 items, 0 new
+  ok    SEC Press                25 items, 0 new
+  ok    BEA News                 49 items, 0 new
+  ok    NPR Business             10 items, 0 new
+  ok    Guardian Business        40 items, 3 new
+  ok    CNBC Top News            15 items, 4 new
+  ok    CNBC Markets             30 items, 0 new
+  ok    MarketWatch              10 items, 6 new
+  ok    Yahoo Finance            49 items, 0 new
+  ok    Fox Business             25 items, 0 new
+  ok    BBC Business             53 items, 2 new
+  ok    Al Jazeera               9 items, 9 new
+  ok    DW Business              20 items, 0 new
+  ok    CoinDesk                 25 items, 1 new
+  ok    Cointelegraph            30 items, 5 new
+  ok    Fed - Speeches           15 items, 0 new
+  ok    Fed - Enforcement        15 items, 0 new
+  ok    EIA Today in Energy      13 items, 0 new
+  ok    Reuters Business (Google) 0 items, 0 new
+  ok    AP Business (Google)     0 items, 0 new
+
+21 feeds alive, 0 dead, 31 new headlines, 31 filtered as off-topic, 0 purged from history
+dead: none
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/score.py
 no matured calls to score
@@ -25,69 +48,10 @@ no matured calls to score
   BTC-USD    1 calls | direction   0.0% | avg option P&L n/a | profitable 0/1
   reminder: option P&L is marked mid-to-mid. Reality is worse.
 
-$ /home/runner/work/Signal-log/Signal-log/scripts/make_prompt.py --symbol BTC-USD
-
-[written to /home/runner/work/Signal-log/Signal-log/PROMPT.md - snapshot id 1047]
-# Signal request - BTC-USD - 2026-10-05 17:06 ET
-
-You are producing ONE directional call for a personal, paper-traded research
-log. It will be scored against real option prices in 1 trading day(s).
-You have no news, no sentiment, no outside context - only the numbers below.
-That is intentional.
-
-## Snapshot
-- Symbol: BTC-USD (crypto)
-- Spot: 85603.015
-- Previous close: 85325.07
-- Day change: +0.33%
-- Data provider: coinbase
-- Session: 24h
-- Snapshot time (UTC): 2026-10-05T18:36:43+00:00
-
-## Recent closes
-- day -13: 86,198.05
-- day -12: 84,378.31
-- day -11: 84,385.46
-- day -10: 84,093.13
-- day -9: 84,416.65
-- day -8: 84,462.14
-- day -7: 83,456.74
-- day -6: 83,638.42
-- day -5: 83,556.14
-- day -4: 84,848.73
-- day -3: 84,504.88
-- day -2: 84,742.22
-- day -1: 86,507.11
-- day -0: 85,728.19
-
-Last close-to-close: -0.90%. 14-day range: 3.7% (low 83,456.74, high 86,507.11).
-
-## ATM option chain
-  (no chain captured for this snapshot)
-
-## Your track record on BTC-USD
-1 scored calls | direction correct 0%
-
-## Output - JSON only, nothing else
-{
-  "direction": "up" | "down" | "flat",
-  "confidence": 1-5,
-  "horizon_days": 1,
-  "rationale": "<=60 words, cite the specific numbers above that drove this",
-  "invalidation": "the price level or condition that proves this call wrong"
-}
-
-Rules:
-- confidence 4 or 5 requires a concrete, stated reason from the data above.
-- "flat" is a legitimate and often correct answer. Use it.
-- If the chain is missing or the spread is wide, say so and lower confidence.
-- Do not hedge into meaninglessness. The log needs a falsifiable call.
-
-
 $ /home/runner/work/Signal-log/Signal-log/scripts/build_site.py
-wrote docs/index.html (20,082 bytes)
-wrote docs/record.html (13,468 bytes)
-wrote docs/news.html (43,829 bytes)
+wrote docs/index.html (20,025 bytes)
+wrote docs/record.html (13,410 bytes)
+wrote docs/news.html (43,968 bytes)
 
 done
 ```
