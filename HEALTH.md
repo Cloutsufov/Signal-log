@@ -1,57 +1,9 @@
 # Last run
 
-`2026-10-08 20:43 UTC` · trigger: `*/30 * * * *`
+`2026-10-09 00:33 UTC` · trigger: `30 20 * * 1-5`
 
 ```
-trigger: action=(none) schedule=*/30 * * * *
-ET now:  2026-10-08 16:43 (postclose)
-plan:    4 step(s)
-  - fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
-  - fetch_news.py
-  - score.py
-  - build_site.py
-
-$ /home/runner/work/Signal-log/Signal-log/scripts/fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
-  ok  BTC-USD: 81748.775 via coinbase (-1.96%)
-  ok  ETH-USD: 2470.42 via coinbase (-3.98%)
-
-$ /home/runner/work/Signal-log/Signal-log/scripts/fetch_news.py
-  ok    Federal Reserve          20 items, 1 new
-  ok    Fed - Monetary Policy    15 items, 0 new
-  ok    SEC Press                25 items, 0 new
-  ok    BEA News                 48 items, 0 new
-  ok    NPR Business             10 items, 0 new
-  ok    Guardian Business        40 items, 4 new
-  ok    CNBC Top News            22 items, 13 new
-  ok    CNBC Markets             30 items, 0 new
-  ok    MarketWatch              10 items, 5 new
-  DEAD  Yahoo Finance            FetchError: GET https://finance.yahoo.com/news/rssindex failed: HTTP 404 Not Found :: <!DOCTYPE html> <html lang="en-us">   <head>     <meta http-equiv="content-type" content="text/html; charset=UTF-8">     <meta charset="utf-8">     <title>Yahoo</title>     <meta name="viewport" conte
-  ok    Fox Business             25 items, 0 new
-  ok    BBC Business             47 items, 3 new
-  ok    Al Jazeera               7 items, 7 new
-  ok    DW Business              20 items, 0 new
-  ok    CoinDesk                 25 items, 6 new
-  ok    Cointelegraph            30 items, 6 new
-  ok    Fed - Speeches           15 items, 0 new
-  ok    Fed - Enforcement        15 items, 0 new
-  ok    EIA Today in Energy      14 items, 0 new
-  ok    Reuters Business (Google) 0 items, 0 new
-  ok    AP Business (Google)     0 items, 0 new
-
-20 feeds alive, 1 dead, 45 new headlines, 26 filtered as off-topic, 0 purged from history
-dead: Yahoo Finance(FetchError)
-
-$ /home/runner/work/Signal-log/Signal-log/scripts/score.py
-no matured calls to score
-
---- record ---
-  BTC-USD    1 calls | direction   0.0% | avg option P&L n/a | profitable 0/1
-  reminder: option P&L is marked mid-to-mid. Reality is worse.
-
-$ /home/runner/work/Signal-log/Signal-log/scripts/build_site.py
-wrote docs/index.html (20,017 bytes)
-wrote docs/record.html (13,410 bytes)
-wrote docs/news.html (43,348 bytes)
-
-done
+trigger: action=(none) schedule=30 20 * * 1-5
+ET now:  2026-10-08 20:33 (postclose)
+nothing to do for this trigger - exiting clean
 ```
