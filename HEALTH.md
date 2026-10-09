@@ -1,10 +1,10 @@
 # Last run
 
-`2026-10-09 19:09 UTC` · trigger: `*/30 * * * *`
+`2026-10-09 23:21 UTC` · trigger: `*/30 * * * *`
 
 ```
 trigger: action=(none) schedule=*/30 * * * *
-ET now:  2026-10-09 15:08 (open)
+ET now:  2026-10-09 19:21 (postclose)
 plan:    4 step(s)
   - fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
   - fetch_news.py
@@ -12,33 +12,33 @@ plan:    4 step(s)
   - build_site.py
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
-  ok  BTC-USD: 82433.135 via coinbase (+0.88%)
-  ok  ETH-USD: 2483.22 via coinbase (+0.83%)
+  ok  BTC-USD: 82579.715 via coinbase (+1.09%)
+  ok  ETH-USD: 2487.695 via coinbase (+0.60%)
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/fetch_news.py
-  ok    Federal Reserve          20 items, 1 new
+  ok    Federal Reserve          20 items, 0 new
   ok    Fed - Monetary Policy    15 items, 0 new
-  ok    SEC Press                25 items, 1 new
+  ok    SEC Press                25 items, 0 new
   ok    BEA News                 48 items, 0 new
-  ok    NPR Business             10 items, 2 new
-  ok    Guardian Business        40 items, 4 new
-  ok    CNBC Top News            21 items, 10 new
+  ok    NPR Business             10 items, 4 new
+  ok    Guardian Business        40 items, 0 new
+  ok    CNBC Top News            21 items, 3 new
   ok    CNBC Markets             30 items, 0 new
-  ok    MarketWatch              10 items, 7 new
+  ok    MarketWatch              10 items, 3 new
   DEAD  Yahoo Finance            FetchError: GET https://finance.yahoo.com/news/rssindex failed: HTTP 404 Not Found :: <!DOCTYPE html> <html lang="en-us">   <head>     <meta http-equiv="content-type" content="text/html; charset=UTF-8">     <meta charset="utf-8">     <title>Yahoo</title>     <meta name="viewport" conte
   ok    Fox Business             25 items, 0 new
-  ok    BBC Business             49 items, 1 new
-  ok    Al Jazeera               8 items, 8 new
-  ok    DW Business              20 items, 1 new
-  ok    CoinDesk                 25 items, 3 new
-  ok    Cointelegraph            30 items, 6 new
+  ok    BBC Business             52 items, 3 new
+  ok    Al Jazeera               8 items, 4 new
+  ok    DW Business              20 items, 0 new
+  ok    CoinDesk                 25 items, 1 new
+  ok    Cointelegraph            30 items, 3 new
   ok    Fed - Speeches           15 items, 0 new
   ok    Fed - Enforcement        15 items, 0 new
   ok    EIA Today in Energy      15 items, 0 new  [1 undated]
   ok    Reuters Business (Google) 0 items, 0 new
   ok    AP Business (Google)     0 items, 0 new
 
-20 feeds alive, 1 dead, 44 new headlines, 26 filtered as off-topic, 0 purged from history
+20 feeds alive, 1 dead, 21 new headlines, 26 filtered as off-topic, 0 purged from history
 dead: Yahoo Finance(FetchError)
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/score.py
@@ -49,9 +49,9 @@ no matured calls to score
   reminder: option P&L is marked mid-to-mid. Reality is worse.
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/build_site.py
-wrote docs/index.html (20,013 bytes)
+wrote docs/index.html (20,015 bytes)
 wrote docs/record.html (13,410 bytes)
-wrote docs/news.html (43,287 bytes)
+wrote docs/news.html (43,390 bytes)
 
 done
 ```
