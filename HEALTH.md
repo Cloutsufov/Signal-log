@@ -1,10 +1,10 @@
 # Last run
 
-`2026-10-10 19:00 UTC` · trigger: `*/30 * * * *`
+`2026-10-10 22:43 UTC` · trigger: `*/30 * * * *`
 
 ```
 trigger: action=(none) schedule=*/30 * * * *
-ET now:  2026-10-10 15:00 (weekend)
+ET now:  2026-10-10 18:43 (weekend)
 plan:    4 step(s)
   - fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
   - fetch_news.py
@@ -12,8 +12,8 @@ plan:    4 step(s)
   - build_site.py
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
-  ok  BTC-USD: 82947.425 via coinbase (+0.84%)
-  ok  ETH-USD: 2509.585 via coinbase (+1.16%)
+  ok  BTC-USD: 82998.765 via coinbase (+0.53%)
+  ok  ETH-USD: 2505.71 via coinbase (+0.76%)
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/fetch_news.py
   ok    Federal Reserve          20 items, 0 new
@@ -21,14 +21,14 @@ $ /home/runner/work/Signal-log/Signal-log/scripts/fetch_news.py
   ok    SEC Press                25 items, 0 new
   ok    BEA News                 48 items, 0 new
   ok    NPR Business             10 items, 0 new
-  ok    Guardian Business        40 items, 3 new
+  ok    Guardian Business        40 items, 1 new
   ok    CNBC Top News            17 items, 0 new
   ok    CNBC Markets             30 items, 0 new
-  ok    MarketWatch              10 items, 0 new
+  ok    MarketWatch              10 items, 4 new
   DEAD  Yahoo Finance            FetchError: GET https://finance.yahoo.com/news/rssindex failed: HTTP 404 Not Found :: <!DOCTYPE html> <html lang="en-us">   <head>     <meta http-equiv="content-type" content="text/html; charset=UTF-8">     <meta charset="utf-8">     <title>Yahoo</title>     <meta name="viewport" conte
   ok    Fox Business             25 items, 0 new
   ok    BBC Business             52 items, 0 new
-  ok    Al Jazeera               3 items, 0 new
+  ok    Al Jazeera               3 items, 3 new
   ok    DW Business              20 items, 0 new
   ok    CoinDesk                 25 items, 0 new
   ok    Cointelegraph            30 items, 0 new
@@ -38,7 +38,7 @@ $ /home/runner/work/Signal-log/Signal-log/scripts/fetch_news.py
   ok    Reuters Business (Google) 0 items, 0 new
   ok    AP Business (Google)     0 items, 0 new
 
-20 feeds alive, 1 dead, 3 new headlines, 35 filtered as off-topic, 0 purged from history
+20 feeds alive, 1 dead, 8 new headlines, 35 filtered as off-topic, 0 purged from history
 dead: Yahoo Finance(FetchError)
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/score.py
@@ -49,9 +49,9 @@ no matured calls to score
   reminder: option P&L is marked mid-to-mid. Reality is worse.
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/build_site.py
-wrote docs/index.html (20,017 bytes)
+wrote docs/index.html (20,018 bytes)
 wrote docs/record.html (13,410 bytes)
-wrote docs/news.html (43,372 bytes)
+wrote docs/news.html (43,588 bytes)
 
 done
 ```
