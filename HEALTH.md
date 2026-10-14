@@ -1,9 +1,9 @@
 # Last run
 
-`2026-10-14 17:26 UTC` · trigger: `30 12 * * 1-5`
+`2026-10-14 18:06 UTC` · trigger: `30 13 * * 1-5`
 
 ```
-trigger: action=(none) schedule=30 12 * * 1-5
-ET now:  2026-10-14 13:26 (open)
+trigger: action=(none) schedule=30 13 * * 1-5
+ET now:  2026-10-14 14:06 (open)
 nothing to do for this trigger - exiting clean
 ```
