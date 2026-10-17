@@ -1,10 +1,10 @@
 # Last run
 
-`2026-10-16 23:43 UTC` · trigger: `*/30 * * * *`
+`2026-10-17 01:50 UTC` · trigger: `*/30 * * * *`
 
 ```
 trigger: action=(none) schedule=*/30 * * * *
-ET now:  2026-10-16 19:43 (postclose)
+ET now:  2026-10-16 21:50 (postclose)
 plan:    4 step(s)
   - fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
   - fetch_news.py
@@ -12,21 +12,21 @@ plan:    4 step(s)
   - build_site.py
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
-  ok  BTC-USD: 81541.875 via coinbase (-0.72%)
-  ok  ETH-USD: 2420.195 via coinbase (-0.79%)
+  ok  BTC-USD: 81425.705 via coinbase (-0.67%)
+  ok  ETH-USD: 2415.68 via coinbase (-0.59%)
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/fetch_news.py
   ok    Fed - Monetary Policy    15 items, 0 new
   ok    SEC Press                25 items, 0 new
   ok    BEA News                 48 items, 0 new
   ok    NPR Business             10 items, 0 new
-  ok    Guardian Business        36 items, 2 new
+  ok    Guardian Business        37 items, 1 new
   ok    CNBC Top News            18 items, 0 new
   ok    CNBC Markets             30 items, 0 new
-  ok    MarketWatch              10 items, 4 new
+  ok    MarketWatch              10 items, 0 new
   ok    Fox Business             25 items, 0 new
   ok    BBC Business             49 items, 0 new
-  ok    Al Jazeera               8 items, 2 new
+  ok    Al Jazeera               7 items, 0 new
   ok    DW Business              20 items, 0 new
   ok    CoinDesk                 25 items, 0 new
   ok    Cointelegraph            30 items, 0 new
@@ -36,7 +36,7 @@ $ /home/runner/work/Signal-log/Signal-log/scripts/fetch_news.py
   ok    Reuters Business (Google) 0 items, 0 new
   ok    AP Business (Google)     0 items, 0 new
 
-19 feeds alive, 0 dead, 8 new headlines, 29 filtered as off-topic, 0 purged from history
+19 feeds alive, 0 dead, 1 new headlines, 30 filtered as off-topic, 0 purged from history
 dead: none
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/score.py
@@ -49,7 +49,7 @@ no matured calls to score
 $ /home/runner/work/Signal-log/Signal-log/scripts/build_site.py
 wrote docs/index.html (20,009 bytes)
 wrote docs/record.html (13,410 bytes)
-wrote docs/news.html (43,374 bytes)
+wrote docs/news.html (43,347 bytes)
 
 done
 ```
