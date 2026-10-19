@@ -1,49 +1,49 @@
-trigger: action=(none) schedule=*/30 * * * *
-ET now:  2026-10-19 11:09 (open)
-plan:    4 step(s)
-  - fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
-  - fetch_news.py
-  - score.py
+trigger: action=(none) schedule=17 12 * * 1
+ET now:  2026-10-19 14:44 (open)
+plan:    2 step(s)
+  - doctor.py --prune
   - build_site.py
 
-$ /home/runner/work/Signal-log/Signal-log/scripts/fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
-  ok  BTC-USD: 82189.615 via coinbase (+1.38%)
-  ok  ETH-USD: 2407.935 via coinbase (+1.33%)
+$ /home/runner/work/Signal-log/Signal-log/scripts/doctor.py --prune
+=== quotes ===
+  OK    coinbase BTC-USD                     165ms  spot 81832.225
+  OK    coinbase ETH-USD                     150ms  spot 2397.85
 
-$ /home/runner/work/Signal-log/Signal-log/scripts/fetch_news.py
-  ok    Fed - Monetary Policy    15 items, 0 new
-  ok    SEC Press                25 items, 0 new
-  ok    BEA News                 48 items, 0 new
-  ok    NPR Business             10 items, 0 new
-  ok    Guardian Business        40 items, 11 new
-  ok    CNBC Top News            18 items, 4 new
-  ok    CNBC Markets             30 items, 1 new
-  ok    MarketWatch              10 items, 7 new
-  ok    Fox Business             25 items, 0 new
-  ok    BBC Business             45 items, 1 new
-  ok    Al Jazeera               9 items, 9 new
-  ok    DW Business              20 items, 0 new
-  ok    CoinDesk                 25 items, 9 new
-  ok    Cointelegraph            30 items, 9 new
-  ok    Fed - Speeches           15 items, 0 new
-  ok    Fed - Enforcement        15 items, 0 new
-  ok    EIA Today in Energy      19 items, 1 new  [1 undated]
-  ok    Reuters Business (Google) 0 items, 0 new
-  ok    AP Business (Google)     0 items, 0 new
+=== options ===
 
-19 feeds alive, 0 dead, 52 new headlines, 28 filtered as off-topic, 0 purged from history
-dead: none
+=== news feeds ===
+  OK    Fed - Monetary Policy [data]          91ms  15 items | Minutes of the Board's discount rate meeting
+  OK    SEC Press [data]                      99ms  25 items | SEC Announces Roundtable on Machine-Understa
+  OK    BEA News [data]                      362ms  48 items | U.S. International Trade in Goods and Servic
+  OK    NPR Business [left]                  364ms  10 items | Noah Adams, longtime host of NPR's All Thing
+  OK    Guardian Business [left]             220ms  40 items | France hit by debt sell-off as violent prote
+  OK    CNBC Top News [center]               105ms  30 items | OpenAI bugging suspect's conduct could pose 
+  OK    CNBC Markets [center]                 68ms  30 items | Women may be at greater risk of AI job losse
+  OK    MarketWatch [center]                 179ms  10 items | One of this year’s most important relationsh
+  OK    Fox Business [right]                  95ms  25 items | Tesla's long-awaited Roadster gets its momen
+  OK    BBC Business [intl]                  126ms  47 items | Vinted blocks French looters listing stolen 
+  OK    Al Jazeera [intl]                    151ms  25 items | Ex-OpenAI employee accused of planting devic
+  OK    DW Business [intl]                   709ms  20 items | EU promotes sovereign, trusted AI as it stru
+  OK    CoinDesk [crypto]                    232ms  25 items | U.S. CFTC rebuffs CME legal stance in conseq
+  OK    Cointelegraph [crypto]               178ms  30 items | Revolut secures Gibraltar crypto license to 
+  OK    Fed - Speeches [data]                 74ms  15 items | Bowman, Supervisory Modernization After Sili
+  OK    Fed - Enforcement [data]             134ms  15 items | Federal Reserve Board announces termination 
+  OK    EIA Today in Energy [data]          8152ms  19 items | Hybrid sales rise while battery electric sal
+  OK    Reuters Business (Google) [center]   276ms  0 items | EMPTY
+  OK    AP Business (Google) [center]        219ms  0 items | EMPTY
 
-$ /home/runner/work/Signal-log/Signal-log/scripts/score.py
-no matured calls to score
+=== summary ===
+  quotes:  2/2 provider+symbol combinations alive
+  options: 0/0 chains alive - scoring degrades to spot-only
+  news:    19/19 feeds alive
 
---- record ---
-  BTC-USD    1 calls | direction   0.0% | avg option P&L n/a | profitable 0/1
-  reminder: option P&L is marked mid-to-mid. Reality is worse.
+  NOTE: without a chain, calls still record and score on spot,
+  but option P&L will be blank. That is a degraded mode, not a
+  broken one. Check if Yahoo now requires a cookie+crumb.
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/build_site.py
-wrote docs/index.html (20,010 bytes)
-wrote docs/record.html (13,410 bytes)
-wrote docs/news.html (43,389 bytes)
+wrote docs/index.html (20,072 bytes)
+wrote docs/record.html (13,468 bytes)
+wrote docs/news.html (43,467 bytes)
 
 done
