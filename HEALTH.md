@@ -1,10 +1,10 @@
 # Last run
 
-`2026-10-22 01:02 UTC` · trigger: `*/30 * * * *`
+`2026-10-22 06:12 UTC` · trigger: `*/30 * * * *`
 
 ```
 trigger: action=(none) schedule=*/30 * * * *
-ET now:  2026-10-21 21:02 (postclose)
+ET now:  2026-10-22 02:12 (premarket)
 plan:    4 step(s)
   - fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
   - fetch_news.py
@@ -12,23 +12,23 @@ plan:    4 step(s)
   - build_site.py
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
-  ok  BTC-USD: 84036.6 via coinbase (+1.36%)
-  ok  ETH-USD: 2468.32 via coinbase (+0.62%)
+  ok  BTC-USD: 82704.98 via coinbase (+0.01%)
+  ok  ETH-USD: 2436.465 via coinbase (-0.03%)
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/fetch_news.py
   ok    Fed - Monetary Policy    15 items, 0 new
   ok    SEC Press                25 items, 0 new
   ok    BEA News                 48 items, 0 new
   ok    NPR Business             10 items, 0 new
-  ok    Guardian Business        40 items, 0 new
+  ok    Guardian Business        40 items, 6 new
   ok    CNBC Top News            21 items, 4 new
   ok    CNBC Markets             30 items, 0 new
-  ok    MarketWatch              10 items, 3 new
+  ok    MarketWatch              10 items, 1 new
   ok    Fox Business             25 items, 0 new
-  ok    BBC Business             55 items, 5 new
-  ok    Al Jazeera               3 items, 2 new
-  ok    DW Business              20 items, 0 new
-  ok    CoinDesk                 25 items, 0 new
+  ok    BBC Business             56 items, 2 new
+  ok    Al Jazeera               5 items, 3 new
+  ok    DW Business              20 items, 1 new
+  ok    CoinDesk                 25 items, 4 new
   ok    Cointelegraph            30 items, 1 new
   ok    Fed - Speeches           15 items, 0 new
   ok    Fed - Enforcement        15 items, 0 new
@@ -36,7 +36,7 @@ $ /home/runner/work/Signal-log/Signal-log/scripts/fetch_news.py
   ok    Reuters Business (Google) 0 items, 0 new
   ok    AP Business (Google)     0 items, 0 new
 
-19 feeds alive, 0 dead, 15 new headlines, 31 filtered as off-topic, 0 purged from history
+19 feeds alive, 0 dead, 22 new headlines, 29 filtered as off-topic, 0 purged from history
 dead: none
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/score.py
@@ -47,9 +47,9 @@ no matured calls to score
   reminder: option P&L is marked mid-to-mid. Reality is worse.
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/build_site.py
-wrote docs/index.html (20,004 bytes)
+wrote docs/index.html (20,008 bytes)
 wrote docs/record.html (13,410 bytes)
-wrote docs/news.html (43,134 bytes)
+wrote docs/news.html (43,124 bytes)
 
 done
 ```
