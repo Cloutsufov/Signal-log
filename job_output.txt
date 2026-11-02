@@ -1,48 +1,86 @@
-trigger: action=(none) schedule=17 12 * * 1
-ET now:  2026-11-02 16:44 (postclose)
-plan:    2 step(s)
-  - doctor.py --prune
+trigger: action=(none) schedule=30 12 * * 1-5
+ET now:  2026-11-02 16:51 (postclose)
+plan:    4 step(s)
+  - fetch_market.py --class equity --symbols SPY,QQQ,IWM
+  - score.py
+  - make_prompt.py --symbol BTC-USD
   - build_site.py
 
-$ /home/runner/work/Signal-log/Signal-log/scripts/doctor.py --prune
-=== quotes ===
-  OK    coinbase BTC-USD                     142ms  spot 76851.415
-  OK    coinbase ETH-USD                     104ms  spot 2254.46
+$ /home/runner/work/Signal-log/Signal-log/scripts/fetch_market.py --class equity --symbols SPY,QQQ,IWM
+FATAL: every symbol failed - check scripts/doctor.py output
+  FAIL SPY: quote failed: all providers failed for SPY: tradier: no TRADIER_TOKEN set | finnhub: no FINNHUB_KEY set | twelvedata: no TWELVEDATA_KEY set | yahoo-q1: HTTP 429 | yahoo-q2: HTTP 429 | stooq-daily: 'Close'
+  FAIL QQQ: quote failed: all providers failed for QQQ: tradier: no TRADIER_TOKEN set | finnhub: no FINNHUB_KEY set | twelvedata: no TWELVEDATA_KEY set | yahoo-q1: HTTP 429 | yahoo-q2: HTTP 429 | stooq-daily: 'Close'
+  FAIL IWM: quote failed: all providers failed for IWM: tradier: no TRADIER_TOKEN set | finnhub: no FINNHUB_KEY set | twelvedata: no TWELVEDATA_KEY set | yahoo-q1: HTTP 429 | yahoo-q2: HTTP 429 | stooq-daily: 'Close'
+  -> exit 1  (tolerated)
 
-=== options ===
+$ /home/runner/work/Signal-log/Signal-log/scripts/score.py
+no matured calls to score
 
-=== news feeds ===
-  OK    Fed - Monetary Policy [data]         112ms  15 items | Federal Reserve issues FOMC statement
-  OK    SEC Press [data]                      81ms  25 items | SEC Issues Exemptive Relief from Treasury Cl
-  OK    BEA News [data]                      335ms  49 items | GDP (Advance Estimate), 3rd Quarter 2026
-  OK    NPR Business [left]                  405ms  10 items | Two economists studied California's billiona
-  OK    Guardian Business [left]             166ms  40 items | Control of Britain’s 39m smart meters passes
-  OK    CNBC Top News [center]                73ms  30 items | Palantir reports booming U.S. commercial rev
-  OK    CNBC Markets [center]                 53ms  30 items | South Korea targets 'world's highest perform
-  OK    MarketWatch [center]                  88ms  10 items | Want to help your adult kids and grandkids? 
-  OK    Fox Business [right]                  94ms  25 items | Google parent Alphabet suffers nearly $500B 
-  OK    BBC Business [intl]                  179ms  49 items | Ryanair says it may freeze workers' pay and 
-  OK    Al Jazeera [intl]                    175ms  25 items | Student protests resume in France as pupils 
-  OK    DW Business [intl]                   565ms  20 items | Germany news: Merz hopes for Korean reunific
-  OK    CoinDesk [crypto]                    276ms  25 items | Big crypto wants the one thing it can’t buy:
-  OK    Cointelegraph [crypto]               105ms  30 items | Crypto investigators flag suspected $106M th
-  OK    Fed - Speeches [data]                 82ms  15 items | Bowman, Supervisory Modernization After Sili
-  OK    Fed - Enforcement [data]             126ms  15 items | Federal Reserve Board announces termination 
-  OK    EIA Today in Energy [data]           121ms  22 items | The share of solar generation with co-locate
-  OK    Reuters Business (Google) [center]   207ms  0 items | EMPTY
-  OK    AP Business (Google) [center]        247ms  0 items | EMPTY
+--- record ---
+  BTC-USD    1 calls | direction   0.0% | avg option P&L n/a | profitable 0/1
+  reminder: option P&L is marked mid-to-mid. Reality is worse.
 
-=== summary ===
-  quotes:  2/2 provider+symbol combinations alive
-  options: 0/0 chains alive - scoring degrades to spot-only
-  news:    19/19 feeds alive
+$ /home/runner/work/Signal-log/Signal-log/scripts/make_prompt.py --symbol BTC-USD
 
-  NOTE: without a chain, calls still record and score on spot,
-  but option P&L will be blank. That is a degraded mode, not a
-  broken one. Check if Yahoo now requires a cookie+crumb.
+[written to /home/runner/work/Signal-log/Signal-log/PROMPT.md - snapshot id 1343]
+# Signal request - BTC-USD - 2026-11-02 16:51 ET
+
+You are producing ONE directional call for a personal, paper-traded research
+log. It will be scored against real option prices in 1 trading day(s).
+You have no news, no sentiment, no outside context - only the numbers below.
+That is intentional.
+
+## Snapshot
+- Symbol: BTC-USD (crypto)
+- Spot: 77617.58
+- Previous close: 77748.44
+- Day change: -0.17%
+- Data provider: coinbase
+- Session: 24h
+- Snapshot time (UTC): 2026-11-02T12:55:30+00:00
+
+## Recent closes
+- day -13: 82,938.26
+- day -12: 84,024.67
+- day -11: 81,307.16
+- day -10: 81,078.04
+- day -9: 80,769.67
+- day -8: 80,053.16
+- day -7: 80,008.79
+- day -6: 80,799.51
+- day -5: 81,249.31
+- day -4: 77,780.33
+- day -3: 77,180.42
+- day -2: 77,423.98
+- day -1: 78,230.55
+- day -0: 76,652.66
+
+Last close-to-close: -2.02%. 14-day range: 9.6% (low 76,652.66, high 84,024.67).
+
+## ATM option chain
+  (no chain captured for this snapshot)
+
+## Your track record on BTC-USD
+1 scored calls | direction correct 0%
+
+## Output - JSON only, nothing else
+{
+  "direction": "up" | "down" | "flat",
+  "confidence": 1-5,
+  "horizon_days": 1,
+  "rationale": "<=60 words, cite the specific numbers above that drove this",
+  "invalidation": "the price level or condition that proves this call wrong"
+}
+
+Rules:
+- confidence 4 or 5 requires a concrete, stated reason from the data above.
+- "flat" is a legitimate and often correct answer. Use it.
+- If the chain is missing or the spread is wide, say so and lower confidence.
+- Do not hedge into meaninglessness. The log needs a falsifiable call.
+
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/build_site.py
-wrote docs/index.html (20,071 bytes)
+wrote docs/index.html (20,082 bytes)
 wrote docs/record.html (13,468 bytes)
 wrote docs/news.html (43,361 bytes)
 
