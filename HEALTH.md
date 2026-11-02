@@ -1,43 +1,22 @@
 # Last run
 
-`2026-11-02 21:59 UTC` · trigger: `*/30 * * * *`
+`2026-11-02 22:24 UTC` · trigger: `30 13 * * 1-5`
 
 ```
-trigger: action=(none) schedule=*/30 * * * *
-ET now:  2026-11-02 16:59 (postclose)
+trigger: action=(none) schedule=30 13 * * 1-5
+ET now:  2026-11-02 17:24 (postclose)
 plan:    4 step(s)
-  - fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
-  - fetch_news.py
+  - fetch_market.py --class equity --symbols SPY,QQQ,IWM
   - score.py
+  - make_prompt.py --symbol BTC-USD
   - build_site.py
 
-$ /home/runner/work/Signal-log/Signal-log/scripts/fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
-  ok  BTC-USD: 76679.995 via coinbase (-1.41%)
-  ok  ETH-USD: 2253.005 via coinbase (-0.37%)
-
-$ /home/runner/work/Signal-log/Signal-log/scripts/fetch_news.py
-  ok    Fed - Monetary Policy    15 items, 0 new
-  ok    SEC Press                25 items, 0 new
-  ok    BEA News                 49 items, 0 new
-  ok    NPR Business             10 items, 0 new
-  ok    Guardian Business        40 items, 8 new
-  ok    CNBC Top News            20 items, 13 new
-  ok    CNBC Markets             30 items, 0 new
-  ok    MarketWatch              10 items, 8 new
-  ok    Fox Business             25 items, 0 new
-  ok    BBC Business             49 items, 1 new
-  ok    Al Jazeera               4 items, 4 new
-  ok    DW Business              20 items, 0 new
-  ok    CoinDesk                 25 items, 11 new
-  ok    Cointelegraph            30 items, 9 new
-  ok    Fed - Speeches           15 items, 0 new
-  ok    Fed - Enforcement        15 items, 0 new
-  ok    EIA Today in Energy      22 items, 0 new  [1 undated]
-  ok    Reuters Business (Google) 0 items, 0 new
-  ok    AP Business (Google)     0 items, 0 new
-
-19 feeds alive, 0 dead, 54 new headlines, 31 filtered as off-topic, 0 purged from history
-dead: none
+$ /home/runner/work/Signal-log/Signal-log/scripts/fetch_market.py --class equity --symbols SPY,QQQ,IWM
+FATAL: every symbol failed - check scripts/doctor.py output
+  FAIL SPY: quote failed: all providers failed for SPY: tradier: no TRADIER_TOKEN set | finnhub: no FINNHUB_KEY set | twelvedata: no TWELVEDATA_KEY set | yahoo-q1: HTTP 429 | yahoo-q2: HTTP 429 | stooq-daily: 'Close'
+  FAIL QQQ: quote failed: all providers failed for QQQ: tradier: no TRADIER_TOKEN set | finnhub: no FINNHUB_KEY set | twelvedata: no TWELVEDATA_KEY set | yahoo-q1: HTTP 429 | yahoo-q2: HTTP 429 | stooq-daily: 'Close'
+  FAIL IWM: quote failed: all providers failed for IWM: tradier: no TRADIER_TOKEN set | finnhub: no FINNHUB_KEY set | twelvedata: no TWELVEDATA_KEY set | yahoo-q1: HTTP 429 | yahoo-q2: HTTP 429 | stooq-daily: 'Close'
+  -> exit 1  (tolerated)
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/score.py
 no matured calls to score
@@ -46,10 +25,69 @@ no matured calls to score
   BTC-USD    1 calls | direction   0.0% | avg option P&L n/a | profitable 0/1
   reminder: option P&L is marked mid-to-mid. Reality is worse.
 
+$ /home/runner/work/Signal-log/Signal-log/scripts/make_prompt.py --symbol BTC-USD
+
+[written to /home/runner/work/Signal-log/Signal-log/PROMPT.md - snapshot id 1345]
+# Signal request - BTC-USD - 2026-11-02 17:24 ET
+
+You are producing ONE directional call for a personal, paper-traded research
+log. It will be scored against real option prices in 1 trading day(s).
+You have no news, no sentiment, no outside context - only the numbers below.
+That is intentional.
+
+## Snapshot
+- Symbol: BTC-USD (crypto)
+- Spot: 76679.995
+- Previous close: 77773.06
+- Day change: -1.41%
+- Data provider: coinbase
+- Session: 24h
+- Snapshot time (UTC): 2026-11-02T21:59:17+00:00
+
+## Recent closes
+- day -13: 82,938.26
+- day -12: 84,024.67
+- day -11: 81,307.16
+- day -10: 81,078.04
+- day -9: 80,769.67
+- day -8: 80,053.16
+- day -7: 80,008.79
+- day -6: 80,799.51
+- day -5: 81,249.31
+- day -4: 77,780.33
+- day -3: 77,180.42
+- day -2: 77,423.98
+- day -1: 78,230.55
+- day -0: 76,851.07
+
+Last close-to-close: -1.76%. 14-day range: 9.3% (low 76,851.07, high 84,024.67).
+
+## ATM option chain
+  (no chain captured for this snapshot)
+
+## Your track record on BTC-USD
+1 scored calls | direction correct 0%
+
+## Output - JSON only, nothing else
+{
+  "direction": "up" | "down" | "flat",
+  "confidence": 1-5,
+  "horizon_days": 1,
+  "rationale": "<=60 words, cite the specific numbers above that drove this",
+  "invalidation": "the price level or condition that proves this call wrong"
+}
+
+Rules:
+- confidence 4 or 5 requires a concrete, stated reason from the data above.
+- "flat" is a legitimate and often correct answer. Use it.
+- If the chain is missing or the spread is wide, say so and lower confidence.
+- Do not hedge into meaninglessness. The log needs a falsifiable call.
+
+
 $ /home/runner/work/Signal-log/Signal-log/scripts/build_site.py
 wrote docs/index.html (20,023 bytes)
-wrote docs/record.html (13,410 bytes)
-wrote docs/news.html (43,227 bytes)
+wrote docs/record.html (13,411 bytes)
+wrote docs/news.html (43,230 bytes)
 
 done
 ```
