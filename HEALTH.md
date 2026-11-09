@@ -1,55 +1,55 @@
 # Last run
 
-`2026-11-09 21:09 UTC` · trigger: `*/30 * * * *`
+`2026-11-09 22:26 UTC` · trigger: `17 12 * * 1`
 
 ```
-trigger: action=(none) schedule=*/30 * * * *
-ET now:  2026-11-09 16:09 (postclose)
-plan:    4 step(s)
-  - fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
-  - fetch_news.py
-  - score.py
+trigger: action=(none) schedule=17 12 * * 1
+ET now:  2026-11-09 17:26 (postclose)
+plan:    2 step(s)
+  - doctor.py --prune
   - build_site.py
 
-$ /home/runner/work/Signal-log/Signal-log/scripts/fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
-  ok  BTC-USD: 74862.36 via coinbase (+1.11%)
-  ok  ETH-USD: 2127.945 via coinbase (+0.11%)
+$ /home/runner/work/Signal-log/Signal-log/scripts/doctor.py --prune
+=== quotes ===
+  OK    coinbase BTC-USD                     173ms  spot 74944.995
+  OK    coinbase ETH-USD                     122ms  spot 2124.435
 
-$ /home/runner/work/Signal-log/Signal-log/scripts/fetch_news.py
-  ok    Fed - Monetary Policy    15 items, 0 new
-  ok    SEC Press                25 items, 0 new
-  ok    BEA News                 49 items, 0 new
-  ok    NPR Business             10 items, 0 new
-  ok    Guardian Business        40 items, 13 new
-  ok    CNBC Top News            23 items, 23 new
-  ok    CNBC Markets             30 items, 0 new
-  ok    MarketWatch              10 items, 9 new
-  ok    Fox Business             25 items, 1 new
-  ok    BBC Business             53 items, 4 new
-  ok    Al Jazeera               6 items, 6 new
-  ok    DW Business              20 items, 1 new
-  ok    CoinDesk                 25 items, 11 new
-  ok    Cointelegraph            30 items, 12 new
-  ok    Fed - Speeches           15 items, 0 new
-  ok    Fed - Enforcement        15 items, 0 new
-  ok    EIA Today in Energy      25 items, 0 new  [1 undated]
-  ok    Reuters Business (Google) 0 items, 0 new
-  ok    AP Business (Google)     0 items, 0 new
+=== options ===
 
-19 feeds alive, 0 dead, 80 new headlines, 26 filtered as off-topic, 0 purged from history
-dead: none
+=== news feeds ===
+  OK    Fed - Monetary Policy [data]          70ms  15 items | Federal Reserve issues FOMC statement
+  OK    SEC Press [data]                     161ms  25 items | SEC Adopts Amendments to Update Definitions 
+  OK    BEA News [data]                       59ms  49 items | U.S. International Trade in Goods and Servic
+  OK    NPR Business [left]                  284ms  10 items | Nvidia shares tumble as the company says it'
+  OK    Guardian Business [left]              76ms  40 items | Silicon Valley and Trump rally behind Nvidia
+  OK    CNBC Top News [center]               116ms  30 items | Jensen Huang affair puts Nvidia's future at 
+  OK    CNBC Markets [center]                137ms  30 items | 3 unexpected reasons the October jobs report
+  OK    MarketWatch [center]                 191ms  10 items | As Nvidia’s stock falls, here’s what Wall St
+  OK    Fox Business [right]                  89ms  25 items | Nvidia shares fall after investigation into 
+  OK    BBC Business [intl]                  178ms  54 items | Nvidia shares tumble over investigation into
+  OK    Al Jazeera [intl]                     53ms  25 items | COP31 opens amid energy crisis as activists 
+  OK    DW Business [intl]                   500ms  20 items | Why Nvidia CEO's affair with alleged Chinese
+  OK    CoinDesk [crypto]                    187ms  25 items | Robinhood backs tokenization of its stock on
+  OK    Cointelegraph [crypto]               145ms  30 items | Here’s what happened in crypto today
+  OK    Fed - Speeches [data]                 49ms  15 items | Bowman, Supervisory Modernization After Sili
+  OK    Fed - Enforcement [data]              58ms  15 items | Federal Reserve Board announces termination 
+  OK    EIA Today in Energy [data]           176ms  25 items | U.S. crude oil imports from Venezuela in Jul
+  OK    Reuters Business (Google) [center]   242ms  0 items | EMPTY
+  OK    AP Business (Google) [center]        242ms  0 items | EMPTY
 
-$ /home/runner/work/Signal-log/Signal-log/scripts/score.py
-no matured calls to score
+=== summary ===
+  quotes:  2/2 provider+symbol combinations alive
+  options: 0/0 chains alive - scoring degrades to spot-only
+  news:    19/19 feeds alive
 
---- record ---
-  BTC-USD    1 calls | direction   0.0% | avg option P&L n/a | profitable 0/1
-  reminder: option P&L is marked mid-to-mid. Reality is worse.
+  NOTE: without a chain, calls still record and score on spot,
+  but option P&L will be blank. That is a degraded mode, not a
+  broken one. Check if Yahoo now requires a cookie+crumb.
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/build_site.py
-wrote docs/index.html (20,006 bytes)
-wrote docs/record.html (13,410 bytes)
-wrote docs/news.html (42,859 bytes)
+wrote docs/index.html (20,009 bytes)
+wrote docs/record.html (13,411 bytes)
+wrote docs/news.html (42,876 bytes)
 
 done
 ```
