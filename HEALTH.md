@@ -1,9 +1,93 @@
 # Last run
 
-`2026-11-12 20:15 UTC` · trigger: `30 12 * * 1-5`
+`2026-11-12 20:59 UTC` · trigger: `30 13 * * 1-5`
 
 ```
-trigger: action=(none) schedule=30 12 * * 1-5
-ET now:  2026-11-12 15:15 (open)
-nothing to do for this trigger - exiting clean
+trigger: action=(none) schedule=30 13 * * 1-5
+ET now:  2026-11-12 15:59 (open)
+plan:    4 step(s)
+  - fetch_market.py --class equity --symbols SPY,QQQ,IWM
+  - score.py
+  - make_prompt.py --symbol BTC-USD
+  - build_site.py
+
+$ /home/runner/work/Signal-log/Signal-log/scripts/fetch_market.py --class equity --symbols SPY,QQQ,IWM
+FATAL: every symbol failed - check scripts/doctor.py output
+  FAIL SPY: quote failed: all providers failed for SPY: tradier: no TRADIER_TOKEN set | finnhub: no FINNHUB_KEY set | twelvedata: no TWELVEDATA_KEY set | yahoo-q1: HTTP 429 | yahoo-q2: HTTP 429 | stooq-daily: 'Close'
+  FAIL QQQ: quote failed: all providers failed for QQQ: tradier: no TRADIER_TOKEN set | finnhub: no FINNHUB_KEY set | twelvedata: no TWELVEDATA_KEY set | yahoo-q1: HTTP 429 | yahoo-q2: HTTP 429 | stooq-daily: 'Close'
+  FAIL IWM: quote failed: all providers failed for IWM: tradier: no TRADIER_TOKEN set | finnhub: no FINNHUB_KEY set | twelvedata: no TWELVEDATA_KEY set | yahoo-q1: HTTP 429 | yahoo-q2: HTTP 429 | stooq-daily: 'Close'
+  -> exit 1  (tolerated)
+
+$ /home/runner/work/Signal-log/Signal-log/scripts/score.py
+no matured calls to score
+
+--- record ---
+  BTC-USD    1 calls | direction   0.0% | avg option P&L n/a | profitable 0/1
+  reminder: option P&L is marked mid-to-mid. Reality is worse.
+
+$ /home/runner/work/Signal-log/Signal-log/scripts/make_prompt.py --symbol BTC-USD
+
+[written to /home/runner/work/Signal-log/Signal-log/PROMPT.md - snapshot id 1421]
+# Signal request - BTC-USD - 2026-11-12 15:59 ET
+
+You are producing ONE directional call for a personal, paper-traded research
+log. It will be scored against real option prices in 1 trading day(s).
+You have no news, no sentiment, no outside context - only the numbers below.
+That is intentional.
+
+## Snapshot
+- Symbol: BTC-USD (crypto)
+- Spot: 71704.645
+- Previous close: 74182.9
+- Day change: -3.34%
+- Data provider: coinbase
+- Session: 24h
+- Snapshot time (UTC): 2026-11-12T16:58:21+00:00
+
+## Recent closes
+- day -13: 77,180.42
+- day -12: 77,423.98
+- day -11: 78,230.55
+- day -10: 76,674.13
+- day -9: 77,336.75
+- day -8: 80,428.31
+- day -7: 75,969.06
+- day -6: 75,731.04
+- day -5: 75,753.96
+- day -4: 74,754.08
+- day -3: 75,259.28
+- day -2: 73,697.87
+- day -1: 73,927.63
+- day -0: 71,376.62
+
+Last close-to-close: -3.45%. 14-day range: 12.7% (low 71,376.62, high 80,428.31).
+
+## ATM option chain
+  (no chain captured for this snapshot)
+
+## Your track record on BTC-USD
+1 scored calls | direction correct 0%
+
+## Output - JSON only, nothing else
+{
+  "direction": "up" | "down" | "flat",
+  "confidence": 1-5,
+  "horizon_days": 1,
+  "rationale": "<=60 words, cite the specific numbers above that drove this",
+  "invalidation": "the price level or condition that proves this call wrong"
+}
+
+Rules:
+- confidence 4 or 5 requires a concrete, stated reason from the data above.
+- "flat" is a legitimate and often correct answer. Use it.
+- If the chain is missing or the spread is wide, say so and lower confidence.
+- Do not hedge into meaninglessness. The log needs a falsifiable call.
+
+
+$ /home/runner/work/Signal-log/Signal-log/scripts/build_site.py
+wrote docs/index.html (20,070 bytes)
+wrote docs/record.html (13,468 bytes)
+wrote docs/news.html (43,017 bytes)
+
+done
 ```
