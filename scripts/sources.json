@@ -134,13 +134,6 @@
       "url": "https://www.eia.gov/rss/todayinenergy.xml"
     },
     {
-      "source": "Reuters Business (Google)",
-      "tier": "press",
-      "lean": "center",
-      "filter": false,
-      "url": "https://news.google.com/rss/search?q=when:24h+allinurl:reuters.com%2Fbusiness&hl=en-US&gl=US&ceid=US:en"
-    },
-    {
       "source": "AP Business (Google)",
       "tier": "press",
       "lean": "center",

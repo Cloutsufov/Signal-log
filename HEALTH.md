@@ -1,55 +1,58 @@
 # Last run
 
-`2026-11-16 16:33 UTC` · trigger: `*/30 * * * *`
+`2026-11-16 22:11 UTC` · trigger: `17 12 * * 1`
 
 ```
-trigger: action=(none) schedule=*/30 * * * *
-ET now:  2026-11-16 11:33 (open)
-plan:    4 step(s)
-  - fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
-  - fetch_news.py
-  - score.py
+trigger: action=(none) schedule=17 12 * * 1
+ET now:  2026-11-16 17:11 (postclose)
+plan:    2 step(s)
+  - doctor.py --prune
   - build_site.py
 
-$ /home/runner/work/Signal-log/Signal-log/scripts/fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
-  ok  BTC-USD: 64660.905 via coinbase (-0.02%)
-  ok  ETH-USD: 1823.885 via coinbase (+0.55%)
+$ /home/runner/work/Signal-log/Signal-log/scripts/doctor.py --prune
+=== quotes ===
+  OK    coinbase BTC-USD                     169ms  spot 65444.845
+  OK    coinbase ETH-USD                     182ms  spot 1834.42
 
-$ /home/runner/work/Signal-log/Signal-log/scripts/fetch_news.py
-  ok    Fed - Monetary Policy    15 items, 0 new
-  ok    SEC Press                25 items, 0 new
-  ok    BEA News                 49 items, 0 new
-  ok    NPR Business             10 items, 0 new
-  ok    Guardian Business        39 items, 12 new
-  ok    CNBC Top News            21 items, 13 new
-  ok    CNBC Markets             30 items, 0 new
-  ok    MarketWatch              10 items, 6 new
-  ok    Fox Business             25 items, 0 new
-  ok    BBC Business             56 items, 2 new
-  ok    Al Jazeera               6 items, 6 new
-  ok    DW Business              20 items, 1 new
-  ok    CoinDesk                 25 items, 13 new
-  ok    Cointelegraph            30 items, 11 new
-  ok    Fed - Speeches           15 items, 1 new
-  ok    Fed - Enforcement        15 items, 0 new
-  ok    EIA Today in Energy      27 items, 0 new  [1 undated]
-  ok    Reuters Business (Google) 0 items, 0 new
-  ok    AP Business (Google)     0 items, 0 new
+=== options ===
 
-19 feeds alive, 0 dead, 65 new headlines, 28 filtered as off-topic, 0 purged from history
-dead: none
+=== news feeds ===
+  OK    Fed - Monetary Policy [data]         135ms  15 items | Federal Reserve announces revised tentative 
+  OK    SEC Press [data]                     234ms  25 items | SEC Proposes Executive and Director Compensa
+  OK    BEA News [data]                      162ms  49 items | U.S. International Trade in Goods and Servic
+  OK    NPR Business [left]                  155ms  10 items | Commerce Department under pressure for delay
+  OK    Guardian Business [left]              61ms  40 items | Trump backs calls for reinstatement of Jense
+  OK    CNBC Top News [center]               267ms  30 items | Trump’s accounts traded up to $97.5 million 
+  OK    CNBC Markets [center]                130ms  30 items | Japan's economy unexpectedly contracts in th
+  OK    MarketWatch [center]                  92ms  10 items | ‘It leaves me with a sour taste’: My elderly
+  OK    Fox Business [right]                 184ms  25 items | Financial stocks slide as online banking out
+  OK    BBC Business [intl]                   83ms  56 items | Trump backs return of ex-Nvidia boss after '
+  OK    Al Jazeera [intl]                    136ms  25 items | California files lawsuit against OpenAI alle
+  OK    DW Business [intl]                   706ms  20 items | Is the AI bubble bursting just as Anthropic 
+  OK    CoinDesk [crypto]                    637ms  25 items | Former Robinhood engineer pleads guilty to i
+  OK    Cointelegraph [crypto]               119ms  30 items | Bitmine edges toward 5% of ETH supply as tre
+  OK    Fed - Speeches [data]                113ms  15 items | Warsh, Opening Remarks
+  OK    Fed - Enforcement [data]             121ms  15 items | Federal Reserve Board issues enforcement act
+  OK    EIA Today in Energy [data]           156ms  27 items | Hydropower generation in the Southwest fell 
+  DEAD  Reuters Business (Google) [center]   548ms  HTTP 429: GET https://news.google.com/rss/search?q=when:24h+allinurl:reuters.com%2Fbusiness&hl=en-US&gl=US&ceid=US:en fa
+  OK    AP Business (Google) [center]        287ms  0 items | EMPTY
 
-$ /home/runner/work/Signal-log/Signal-log/scripts/score.py
-no matured calls to score
+=== summary ===
+  quotes:  2/2 provider+symbol combinations alive
+  options: 0/0 chains alive - scoring degrades to spot-only
+  news:    18/19 feeds alive
+  PRUNED 1 dead feed(s) from sources.json:
+    Reuters Business (Google)
+  (one bad run can remove a good feed - revert the commit if a source you want disappears)
 
---- record ---
-  BTC-USD    1 calls | direction   0.0% | avg option P&L n/a | profitable 0/1
-  reminder: option P&L is marked mid-to-mid. Reality is worse.
+  NOTE: without a chain, calls still record and score on spot,
+  but option P&L will be blank. That is a degraded mode, not a
+  broken one. Check if Yahoo now requires a cookie+crumb.
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/build_site.py
-wrote docs/index.html (20,001 bytes)
-wrote docs/record.html (13,410 bytes)
-wrote docs/news.html (42,998 bytes)
+wrote docs/index.html (20,063 bytes)
+wrote docs/record.html (13,468 bytes)
+wrote docs/news.html (43,098 bytes)
 
 done
 ```
