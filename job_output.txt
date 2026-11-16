@@ -1,51 +1,86 @@
-trigger: action=(none) schedule=17 12 * * 1
-ET now:  2026-11-16 17:11 (postclose)
-plan:    2 step(s)
-  - doctor.py --prune
+trigger: action=(none) schedule=30 12 * * 1-5
+ET now:  2026-11-16 17:24 (postclose)
+plan:    4 step(s)
+  - fetch_market.py --class equity --symbols SPY,QQQ,IWM
+  - score.py
+  - make_prompt.py --symbol BTC-USD
   - build_site.py
 
-$ /home/runner/work/Signal-log/Signal-log/scripts/doctor.py --prune
-=== quotes ===
-  OK    coinbase BTC-USD                     169ms  spot 65444.845
-  OK    coinbase ETH-USD                     182ms  spot 1834.42
+$ /home/runner/work/Signal-log/Signal-log/scripts/fetch_market.py --class equity --symbols SPY,QQQ,IWM
+FATAL: every symbol failed - check scripts/doctor.py output
+  FAIL SPY: quote failed: all providers failed for SPY: tradier: no TRADIER_TOKEN set | finnhub: no FINNHUB_KEY set | twelvedata: no TWELVEDATA_KEY set | yahoo-q1: HTTP 429 | yahoo-q2: HTTP 429 | stooq-daily: 'Close'
+  FAIL QQQ: quote failed: all providers failed for QQQ: tradier: no TRADIER_TOKEN set | finnhub: no FINNHUB_KEY set | twelvedata: no TWELVEDATA_KEY set | yahoo-q1: HTTP 429 | yahoo-q2: HTTP 429 | stooq-daily: 'Close'
+  FAIL IWM: quote failed: all providers failed for IWM: tradier: no TRADIER_TOKEN set | finnhub: no FINNHUB_KEY set | twelvedata: no TWELVEDATA_KEY set | yahoo-q1: HTTP 429 | yahoo-q2: HTTP 429 | stooq-daily: 'Close'
+  -> exit 1  (tolerated)
 
-=== options ===
+$ /home/runner/work/Signal-log/Signal-log/scripts/score.py
+no matured calls to score
 
-=== news feeds ===
-  OK    Fed - Monetary Policy [data]         135ms  15 items | Federal Reserve announces revised tentative 
-  OK    SEC Press [data]                     234ms  25 items | SEC Proposes Executive and Director Compensa
-  OK    BEA News [data]                      162ms  49 items | U.S. International Trade in Goods and Servic
-  OK    NPR Business [left]                  155ms  10 items | Commerce Department under pressure for delay
-  OK    Guardian Business [left]              61ms  40 items | Trump backs calls for reinstatement of Jense
-  OK    CNBC Top News [center]               267ms  30 items | Trump’s accounts traded up to $97.5 million 
-  OK    CNBC Markets [center]                130ms  30 items | Japan's economy unexpectedly contracts in th
-  OK    MarketWatch [center]                  92ms  10 items | ‘It leaves me with a sour taste’: My elderly
-  OK    Fox Business [right]                 184ms  25 items | Financial stocks slide as online banking out
-  OK    BBC Business [intl]                   83ms  56 items | Trump backs return of ex-Nvidia boss after '
-  OK    Al Jazeera [intl]                    136ms  25 items | California files lawsuit against OpenAI alle
-  OK    DW Business [intl]                   706ms  20 items | Is the AI bubble bursting just as Anthropic 
-  OK    CoinDesk [crypto]                    637ms  25 items | Former Robinhood engineer pleads guilty to i
-  OK    Cointelegraph [crypto]               119ms  30 items | Bitmine edges toward 5% of ETH supply as tre
-  OK    Fed - Speeches [data]                113ms  15 items | Warsh, Opening Remarks
-  OK    Fed - Enforcement [data]             121ms  15 items | Federal Reserve Board issues enforcement act
-  OK    EIA Today in Energy [data]           156ms  27 items | Hydropower generation in the Southwest fell 
-  DEAD  Reuters Business (Google) [center]   548ms  HTTP 429: GET https://news.google.com/rss/search?q=when:24h+allinurl:reuters.com%2Fbusiness&hl=en-US&gl=US&ceid=US:en fa
-  OK    AP Business (Google) [center]        287ms  0 items | EMPTY
+--- record ---
+  BTC-USD    1 calls | direction   0.0% | avg option P&L n/a | profitable 0/1
+  reminder: option P&L is marked mid-to-mid. Reality is worse.
 
-=== summary ===
-  quotes:  2/2 provider+symbol combinations alive
-  options: 0/0 chains alive - scoring degrades to spot-only
-  news:    18/19 feeds alive
-  PRUNED 1 dead feed(s) from sources.json:
-    Reuters Business (Google)
-  (one bad run can remove a good feed - revert the commit if a source you want disappears)
+$ /home/runner/work/Signal-log/Signal-log/scripts/make_prompt.py --symbol BTC-USD
 
-  NOTE: without a chain, calls still record and score on spot,
-  but option P&L will be blank. That is a degraded mode, not a
-  broken one. Check if Yahoo now requires a cookie+crumb.
+[written to /home/runner/work/Signal-log/Signal-log/PROMPT.md - snapshot id 1453]
+# Signal request - BTC-USD - 2026-11-16 17:24 ET
+
+You are producing ONE directional call for a personal, paper-traded research
+log. It will be scored against real option prices in 1 trading day(s).
+You have no news, no sentiment, no outside context - only the numbers below.
+That is intentional.
+
+## Snapshot
+- Symbol: BTC-USD (crypto)
+- Spot: 64660.905
+- Previous close: 64672.19
+- Day change: -0.02%
+- Data provider: coinbase
+- Session: 24h
+- Snapshot time (UTC): 2026-11-16T16:33:15+00:00
+
+## Recent closes
+- day -13: 77,336.75
+- day -12: 80,428.31
+- day -11: 75,969.06
+- day -10: 75,731.04
+- day -9: 75,753.96
+- day -8: 74,754.08
+- day -7: 75,259.28
+- day -6: 73,697.87
+- day -5: 73,927.63
+- day -4: 71,369.90
+- day -3: 68,236.54
+- day -2: 64,118.79
+- day -1: 65,315.35
+- day -0: 65,349.00
+
+Last close-to-close: +0.05%. 14-day range: 25.4% (low 64,118.79, high 80,428.31).
+
+## ATM option chain
+  (no chain captured for this snapshot)
+
+## Your track record on BTC-USD
+1 scored calls | direction correct 0%
+
+## Output - JSON only, nothing else
+{
+  "direction": "up" | "down" | "flat",
+  "confidence": 1-5,
+  "horizon_days": 1,
+  "rationale": "<=60 words, cite the specific numbers above that drove this",
+  "invalidation": "the price level or condition that proves this call wrong"
+}
+
+Rules:
+- confidence 4 or 5 requires a concrete, stated reason from the data above.
+- "flat" is a legitimate and often correct answer. Use it.
+- If the chain is missing or the spread is wide, say so and lower confidence.
+- Do not hedge into meaninglessness. The log needs a falsifiable call.
+
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/build_site.py
-wrote docs/index.html (20,063 bytes)
+wrote docs/index.html (20,074 bytes)
 wrote docs/record.html (13,468 bytes)
 wrote docs/news.html (43,098 bytes)
 
