@@ -1,4 +1,4 @@
-# Signal request - BTC-USD - 2026-11-17 16:11 ET
+# Signal request - BTC-USD - 2026-11-17 16:51 ET
 
 You are producing ONE directional call for a personal, paper-traded research
 log. It will be scored against real option prices in 1 trading day(s).
@@ -28,9 +28,9 @@ That is intentional.
 - day -3: 64,118.79
 - day -2: 65,315.35
 - day -1: 64,816.79
-- day -0: 63,968.39
+- day -0: 64,249.81
 
-Last close-to-close: -1.31%. 14-day range: 25.7% (low 63,968.39, high 80,428.31).
+Last close-to-close: -0.87%. 14-day range: 25.4% (low 64,118.79, high 80,428.31).
 
 ## ATM option chain
   (no chain captured for this snapshot)
