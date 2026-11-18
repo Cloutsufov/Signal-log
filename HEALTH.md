@@ -1,10 +1,10 @@
 # Last run
 
-`2026-11-18 07:45 UTC` · trigger: `*/30 * * * *`
+`2026-11-18 16:46 UTC` · trigger: `*/30 * * * *`
 
 ```
 trigger: action=(none) schedule=*/30 * * * *
-ET now:  2026-11-18 02:44 (premarket)
+ET now:  2026-11-18 11:46 (open)
 plan:    4 step(s)
   - fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
   - fetch_news.py
@@ -12,31 +12,31 @@ plan:    4 step(s)
   - build_site.py
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
-  ok  BTC-USD: 64522.905 via coinbase (-0.24%)
-  ok  ETH-USD: 1809.45 via coinbase (-1.15%)
+  ok  BTC-USD: 62433.055 via coinbase (-1.94%)
+  ok  ETH-USD: 1738.93 via coinbase (-2.09%)
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/fetch_news.py
   ok    Fed - Monetary Policy    15 items, 0 new
-  ok    SEC Press                25 items, 1 new
-  ok    BEA News                 49 items, 0 new
-  ok    NPR Business             10 items, 0 new
-  ok    Guardian Business        40 items, 9 new
-  ok    CNBC Top News            18 items, 6 new
+  ok    SEC Press                25 items, 0 new
+  ok    BEA News                 49 items, 1 new
+  ok    NPR Business             10 items, 2 new
+  DEAD  Guardian Business        FetchError: GET https://www.theguardian.com/uk/business/rss failed: HTTP 403 Forbidden :: Forbidden
+  ok    CNBC Top News            17 items, 15 new
   ok    CNBC Markets             30 items, 1 new
-  ok    MarketWatch              10 items, 3 new
+  ok    MarketWatch              10 items, 7 new
   ok    Fox Business             25 items, 0 new
-  ok    BBC Business             43 items, 6 new
-  ok    Al Jazeera               9 items, 9 new
+  ok    BBC Business             46 items, 2 new
+  ok    Al Jazeera               8 items, 8 new
   ok    DW Business              20 items, 0 new
-  ok    CoinDesk                 25 items, 6 new
-  ok    Cointelegraph            30 items, 2 new
+  ok    CoinDesk                 25 items, 11 new
+  ok    Cointelegraph            30 items, 11 new
   ok    Fed - Speeches           15 items, 0 new
   ok    Fed - Enforcement        15 items, 0 new
-  ok    EIA Today in Energy      28 items, 0 new  [1 undated]
+  ok    EIA Today in Energy      29 items, 1 new  [1 undated]
   ok    AP Business (Google)     0 items, 0 new
 
-18 feeds alive, 0 dead, 43 new headlines, 28 filtered as off-topic, 0 purged from history
-dead: none
+17 feeds alive, 1 dead, 59 new headlines, 30 filtered as off-topic, 0 purged from history
+dead: Guardian Business(FetchError)
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/score.py
 no matured calls to score
@@ -46,9 +46,9 @@ no matured calls to score
   reminder: option P&L is marked mid-to-mid. Reality is worse.
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/build_site.py
-wrote docs/index.html (20,021 bytes)
+wrote docs/index.html (20,017 bytes)
 wrote docs/record.html (13,410 bytes)
-wrote docs/news.html (42,437 bytes)
+wrote docs/news.html (43,187 bytes)
 
 done
 ```
