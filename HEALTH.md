@@ -1,10 +1,10 @@
 # Last run
 
-`2026-11-19 20:53 UTC` · trigger: `30 12 * * 1-5`
+`2026-11-19 21:42 UTC` · trigger: `30 13 * * 1-5`
 
 ```
-trigger: action=(none) schedule=30 12 * * 1-5
-ET now:  2026-11-19 15:53 (open)
+trigger: action=(none) schedule=30 13 * * 1-5
+ET now:  2026-11-19 16:42 (postclose)
 plan:    4 step(s)
   - fetch_market.py --class equity --symbols SPY,QQQ,IWM
   - score.py
@@ -28,7 +28,7 @@ no matured calls to score
 $ /home/runner/work/Signal-log/Signal-log/scripts/make_prompt.py --symbol BTC-USD
 
 [written to /home/runner/work/Signal-log/Signal-log/PROMPT.md - snapshot id 1471]
-# Signal request - BTC-USD - 2026-11-19 15:53 ET
+# Signal request - BTC-USD - 2026-11-19 16:42 ET
 
 You are producing ONE directional call for a personal, paper-traded research
 log. It will be scored against real option prices in 1 trading day(s).
@@ -58,9 +58,9 @@ That is intentional.
 - day -3: 64,816.79
 - day -2: 64,873.18
 - day -1: 62,981.71
-- day -0: 62,080.85
+- day -0: 61,488.38
 
-Last close-to-close: -1.43%. 14-day range: 22.0% (low 62,080.85, high 75,753.96).
+Last close-to-close: -2.37%. 14-day range: 23.2% (low 61,488.38, high 75,753.96).
 
 ## ATM option chain
   (no chain captured for this snapshot)
@@ -85,9 +85,9 @@ Rules:
 
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/build_site.py
-wrote docs/index.html (20,085 bytes)
+wrote docs/index.html (20,082 bytes)
 wrote docs/record.html (13,468 bytes)
-wrote docs/news.html (43,512 bytes)
+wrote docs/news.html (43,517 bytes)
 
 done
 ```
