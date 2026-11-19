@@ -1,4 +1,4 @@
-# Signal request - BTC-USD - 2026-11-18 16:30 ET
+# Signal request - BTC-USD - 2026-11-19 15:53 ET
 
 You are producing ONE directional call for a personal, paper-traded research
 log. It will be scored against real option prices in 1 trading day(s).
@@ -7,30 +7,30 @@ That is intentional.
 
 ## Snapshot
 - Symbol: BTC-USD (crypto)
-- Spot: 62433.055
-- Previous close: 63669.46
-- Day change: -1.94%
+- Spot: 63652.565
+- Previous close: 63864.78
+- Day change: -0.33%
 - Data provider: coinbase
 - Session: 24h
-- Snapshot time (UTC): 2026-11-18T16:46:18+00:00
+- Snapshot time (UTC): 2026-11-19T13:37:19+00:00
 
 ## Recent closes
-- day -13: 75,969.06
-- day -12: 75,731.04
-- day -11: 75,753.96
-- day -10: 74,754.08
-- day -9: 75,259.28
-- day -8: 73,697.87
-- day -7: 73,927.63
-- day -6: 71,369.90
-- day -5: 68,236.54
-- day -4: 64,118.79
-- day -3: 65,315.35
-- day -2: 64,816.79
-- day -1: 64,873.18
-- day -0: 62,408.94
+- day -13: 75,731.04
+- day -12: 75,753.96
+- day -11: 74,754.08
+- day -10: 75,259.28
+- day -9: 73,697.87
+- day -8: 73,927.63
+- day -7: 71,369.90
+- day -6: 68,236.54
+- day -5: 64,118.79
+- day -4: 65,315.35
+- day -3: 64,816.79
+- day -2: 64,873.18
+- day -1: 62,981.71
+- day -0: 62,080.85
 
-Last close-to-close: -3.80%. 14-day range: 21.7% (low 62,408.94, high 75,969.06).
+Last close-to-close: -1.43%. 14-day range: 22.0% (low 62,080.85, high 75,753.96).
 
 ## ATM option chain
   (no chain captured for this snapshot)
