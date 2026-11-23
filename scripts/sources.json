@@ -43,13 +43,6 @@
       "filter": false
     },
     {
-      "source": "Guardian Business",
-      "tier": "press",
-      "lean": "left",
-      "url": "https://www.theguardian.com/uk/business/rss",
-      "filter": false
-    },
-    {
       "source": "CNBC Top News",
       "tier": "press",
       "lean": "center",

@@ -1,54 +1,57 @@
 # Last run
 
-`2026-11-23 21:48 UTC` · trigger: `*/30 * * * *`
+`2026-11-23 23:58 UTC` · trigger: `17 12 * * 1`
 
 ```
-trigger: action=(none) schedule=*/30 * * * *
-ET now:  2026-11-23 16:48 (postclose)
-plan:    4 step(s)
-  - fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
-  - fetch_news.py
-  - score.py
+trigger: action=(none) schedule=17 12 * * 1
+ET now:  2026-11-23 18:58 (postclose)
+plan:    2 step(s)
+  - doctor.py --prune
   - build_site.py
 
-$ /home/runner/work/Signal-log/Signal-log/scripts/fetch_market.py --class crypto --symbols BTC-USD,ETH-USD
-  ok  BTC-USD: 61030.545 via coinbase (+0.30%)
-  ok  ETH-USD: 1711.675 via coinbase (-0.33%)
+$ /home/runner/work/Signal-log/Signal-log/scripts/doctor.py --prune
+=== quotes ===
+  OK    coinbase BTC-USD                      68ms  spot 61193.905
+  OK    coinbase ETH-USD                      51ms  spot 1708.605
 
-$ /home/runner/work/Signal-log/Signal-log/scripts/fetch_news.py
-  ok    Fed - Monetary Policy    15 items, 0 new
-  ok    SEC Press                25 items, 0 new
-  ok    BEA News                 49 items, 0 new
-  ok    NPR Business             10 items, 2 new
-  DEAD  Guardian Business        FetchError: GET https://www.theguardian.com/uk/business/rss failed: HTTP 403 Forbidden :: Forbidden
-  ok    CNBC Top News            15 items, 13 new
-  ok    CNBC Markets             30 items, 1 new
-  ok    MarketWatch              10 items, 10 new
-  ok    Fox Business             25 items, 3 new
-  ok    BBC Business             54 items, 6 new
-  ok    Al Jazeera               7 items, 7 new
-  ok    DW Business              20 items, 3 new
-  ok    CoinDesk                 25 items, 18 new
-  ok    Cointelegraph            30 items, 16 new
-  ok    Fed - Speeches           15 items, 0 new
-  ok    Fed - Enforcement        15 items, 0 new
-  ok    EIA Today in Energy      30 items, 0 new  [1 undated]
-  ok    AP Business (Google)     0 items, 0 new
+=== options ===
 
-17 feeds alive, 1 dead, 79 new headlines, 33 filtered as off-topic, 0 purged from history
-dead: Guardian Business(FetchError)
+=== news feeds ===
+  OK    Fed - Monetary Policy [data]          64ms  15 items | Minutes of the Federal Open Market Committee
+  OK    SEC Press [data]                     188ms  25 items | SEC Issues Proposal to Restructure the Conso
+  OK    BEA News [data]                       74ms  49 items | Activities of U.S. Multinational Enterprises
+  OK    NPR Business [left]                  235ms  10 items | They attended Trump's controversial meme coi
+  DEAD  Guardian Business [left]              55ms  HTTP 403: GET https://www.theguardian.com/uk/business/rss failed: HTTP 403 Forbidden :: Forbidden
+  OK    CNBC Top News [center]                95ms  30 items | Nvidia surge: What investors should do with 
+  OK    CNBC Markets [center]                115ms  30 items | Peterson: Here’s what Bessent’s about-face o
+  OK    MarketWatch [center]                  96ms  10 items | The newest addition to the S&P 500 is a make
+  OK    Fox Business [right]                  84ms  25 items | What Jensen Huang’s return means for Nvidia 
+  OK    BBC Business [intl]                  375ms  55 items | Nvidia reinstates CEO Jensen Huang after aff
+  OK    Al Jazeera [intl]                    177ms  25 items | Drone attack on Colombia police base injures
+  OK    DW Business [intl]                   486ms  20 items | Nvidia reinstates former CEO Jensen Huang de
+  OK    CoinDesk [crypto]                    122ms  25 items | New York judge declines to block Kalshi from
+  OK    Cointelegraph [crypto]                69ms  30 items | CFTC staff say exchanges can count Bitcoin t
+  OK    Fed - Speeches [data]                 43ms  15 items | Cook, The U.S. Economy in Global Context
+  OK    Fed - Enforcement [data]              30ms  15 items | Federal Reserve Board issues enforcement act
+  OK    EIA Today in Energy [data]            88ms  30 items | Oil flows through Middle East chokepoints in
+  OK    AP Business (Google) [center]        198ms  0 items | EMPTY
 
-$ /home/runner/work/Signal-log/Signal-log/scripts/score.py
-no matured calls to score
+=== summary ===
+  quotes:  2/2 provider+symbol combinations alive
+  options: 0/0 chains alive - scoring degrades to spot-only
+  news:    17/18 feeds alive
+  PRUNED 1 dead feed(s) from sources.json:
+    Guardian Business
+  (one bad run can remove a good feed - revert the commit if a source you want disappears)
 
---- record ---
-  BTC-USD    1 calls | direction   0.0% | avg option P&L n/a | profitable 0/1
-  reminder: option P&L is marked mid-to-mid. Reality is worse.
+  NOTE: without a chain, calls still record and score on spot,
+  but option P&L will be blank. That is a degraded mode, not a
+  broken one. Check if Yahoo now requires a cookie+crumb.
 
 $ /home/runner/work/Signal-log/Signal-log/scripts/build_site.py
-wrote docs/index.html (20,010 bytes)
-wrote docs/record.html (13,410 bytes)
-wrote docs/news.html (43,118 bytes)
+wrote docs/index.html (20,072 bytes)
+wrote docs/record.html (13,468 bytes)
+wrote docs/news.html (43,204 bytes)
 
 done
 ```
