@@ -1,57 +1,9 @@
 # Last run
 
-`2026-11-23 23:58 UTC` · trigger: `17 12 * * 1`
+`2026-11-24 00:10 UTC` · trigger: `30 12 * * 1-5`
 
 ```
-trigger: action=(none) schedule=17 12 * * 1
-ET now:  2026-11-23 18:58 (postclose)
-plan:    2 step(s)
-  - doctor.py --prune
-  - build_site.py
-
-$ /home/runner/work/Signal-log/Signal-log/scripts/doctor.py --prune
-=== quotes ===
-  OK    coinbase BTC-USD                      68ms  spot 61193.905
-  OK    coinbase ETH-USD                      51ms  spot 1708.605
-
-=== options ===
-
-=== news feeds ===
-  OK    Fed - Monetary Policy [data]          64ms  15 items | Minutes of the Federal Open Market Committee
-  OK    SEC Press [data]                     188ms  25 items | SEC Issues Proposal to Restructure the Conso
-  OK    BEA News [data]                       74ms  49 items | Activities of U.S. Multinational Enterprises
-  OK    NPR Business [left]                  235ms  10 items | They attended Trump's controversial meme coi
-  DEAD  Guardian Business [left]              55ms  HTTP 403: GET https://www.theguardian.com/uk/business/rss failed: HTTP 403 Forbidden :: Forbidden
-  OK    CNBC Top News [center]                95ms  30 items | Nvidia surge: What investors should do with 
-  OK    CNBC Markets [center]                115ms  30 items | Peterson: Here’s what Bessent’s about-face o
-  OK    MarketWatch [center]                  96ms  10 items | The newest addition to the S&P 500 is a make
-  OK    Fox Business [right]                  84ms  25 items | What Jensen Huang’s return means for Nvidia 
-  OK    BBC Business [intl]                  375ms  55 items | Nvidia reinstates CEO Jensen Huang after aff
-  OK    Al Jazeera [intl]                    177ms  25 items | Drone attack on Colombia police base injures
-  OK    DW Business [intl]                   486ms  20 items | Nvidia reinstates former CEO Jensen Huang de
-  OK    CoinDesk [crypto]                    122ms  25 items | New York judge declines to block Kalshi from
-  OK    Cointelegraph [crypto]                69ms  30 items | CFTC staff say exchanges can count Bitcoin t
-  OK    Fed - Speeches [data]                 43ms  15 items | Cook, The U.S. Economy in Global Context
-  OK    Fed - Enforcement [data]              30ms  15 items | Federal Reserve Board issues enforcement act
-  OK    EIA Today in Energy [data]            88ms  30 items | Oil flows through Middle East chokepoints in
-  OK    AP Business (Google) [center]        198ms  0 items | EMPTY
-
-=== summary ===
-  quotes:  2/2 provider+symbol combinations alive
-  options: 0/0 chains alive - scoring degrades to spot-only
-  news:    17/18 feeds alive
-  PRUNED 1 dead feed(s) from sources.json:
-    Guardian Business
-  (one bad run can remove a good feed - revert the commit if a source you want disappears)
-
-  NOTE: without a chain, calls still record and score on spot,
-  but option P&L will be blank. That is a degraded mode, not a
-  broken one. Check if Yahoo now requires a cookie+crumb.
-
-$ /home/runner/work/Signal-log/Signal-log/scripts/build_site.py
-wrote docs/index.html (20,072 bytes)
-wrote docs/record.html (13,468 bytes)
-wrote docs/news.html (43,204 bytes)
-
-done
+trigger: action=(none) schedule=30 12 * * 1-5
+ET now:  2026-11-23 19:10 (postclose)
+nothing to do for this trigger - exiting clean
 ```
